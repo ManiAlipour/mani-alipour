@@ -1,7 +1,5 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
-  return <div className="text-neon-blue text-3xl">
-    
-    </div>;
+  return <div className="text-neon-green text-3xl">مانی علیپور</div>;
 }
