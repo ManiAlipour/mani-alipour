@@ -59,7 +59,7 @@ export async function registerService(input: RegisterInput) {
     role: newUser.role,
   };
 
-  const token = signJWT(tokenPayload, "1d");
+  const token = signJWT(tokenPayload, "30d");
 
   return {
     user: {
