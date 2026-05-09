@@ -28,6 +28,7 @@ const tagSchema = new Schema<ITagDocument>(
 
     description: {
       type: String,
+      default: "",
     },
 
     postCount: {
