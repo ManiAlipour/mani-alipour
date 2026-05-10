@@ -7,7 +7,6 @@ import {
   deleteContact,
 } from "@/services/contact.service";
 
-// GET: دریافت یک پیام تکی بر اساس id
 export const GET = async (
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -40,7 +39,6 @@ export const GET = async (
   }
 };
 
-// PATCH: بروزرسانی پیام بر اساس id
 export const PATCH = async (
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -52,9 +50,17 @@ export const PATCH = async (
 
     const validated = await updateContactSchema.validate(body, {
       abortEarly: false,
+      stripUnknown: true,
     });
 
-    const updated = await updateContact(id, validated);
+    const sanitized: Record<string, any> = {};
+    for (const [key, value] of Object.entries(validated)) {
+      if (value !== null && value !== undefined) {
+        sanitized[key] = value;
+      }
+    }
+
+    const updated = await updateContact(id, sanitized);
 
     if (!updated) {
       return NextResponse.json(
@@ -87,7 +93,6 @@ export const PATCH = async (
   }
 };
 
-// DELETE: حذف یک پیام بر اساس id
 export const DELETE = async (
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
