@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { getBlogsService, createBlogService } from "@/services/blog.service";
 import { createBlogSchema } from "@/lib/validators/blog.validator";
 import { AuthRequest } from "@/lib/middleware/auth";
-import { withAdmin } from "@/lib/middleware/admin";
+import { isAdmin } from "@/lib/middleware/admin";
 
 // Handles GET requests for fetching blogs
 export async function GET(req: NextRequest) {
@@ -19,9 +19,18 @@ export async function GET(req: NextRequest) {
   }
 }
 
-
-export const POST = withAdmin(async (req: NextRequest) => {
+export const POST = async (req: NextRequest) => {
   try {
+    const admin = isAdmin(req);
+
+    if (!admin)
+      return NextResponse.json(
+        {
+          message: "دسترسی نامعتبر",
+        },
+        { status: 401 },
+      );
+
     await connectDB();
     const body = await req.json();
 
@@ -54,4 +63,4 @@ export const POST = withAdmin(async (req: NextRequest) => {
       { status: 500 },
     );
   }
-});
+};

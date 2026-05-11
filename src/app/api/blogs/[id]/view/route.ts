@@ -3,54 +3,61 @@ import { connectDB } from "@/lib/mongodb";
 import { verifyJWT } from "@/utils/jwt";
 import View from "@/models/View";
 import Blog from "@/models/Blog";
-import { withAdmin } from "@/lib/middleware/admin";
+import { isAdmin } from "@/lib/middleware/admin";
 
-export const GET = withAdmin(
-  async (
-    req: NextRequest,
-    {
-      params,
-    }: {
-      params: Promise<{ id: string }>;
-    },
-  ) => {
-    try {
-      await connectDB();
+export const GET = async (
+  req: NextRequest,
+  {
+    params,
+  }: {
+    params: Promise<{ id: string }>;
+  },
+) => {
+  try {
+    const admin = isAdmin(req);
 
-      const { id: postId } = await params;
-
-      const blog = await Blog.findById(postId);
-      if (!blog) {
-        return NextResponse.json(
-          { message: "پست مورد نظر یافت نشد" },
-          { status: 404 },
-        );
-      }
-
-      const totalViews = await View.countDocuments({ postId });
-
-      const uniqueUsers = await View.distinct("userId", {
-        postId,
-        userId: { $ne: null },
-      });
-      const uniqueIps = await View.distinct("ip", { postId, userId: null });
-
-      return NextResponse.json({
-        message: "آمار بازدید با موفقیت دریافت شد",
-        data: {
-          totalViews,
-          uniqueUserCount: uniqueUsers.length,
-          uniqueIpCount: uniqueIps.length,
-        },
-      });
-    } catch (error: any) {
+    if (!admin)
       return NextResponse.json(
-        { message: "خطا در دریافت آمار بازدید", error: error?.message },
-        { status: 500 },
+        {
+          message: "دسترسی نامعتبر",
+        },
+        { status: 401 },
+      );
+    await connectDB();
+
+    const { id: postId } = await params;
+
+    const blog = await Blog.findById(postId);
+    if (!blog) {
+      return NextResponse.json(
+        { message: "پست مورد نظر یافت نشد" },
+        { status: 404 },
       );
     }
-  },
-);
+
+    const totalViews = await View.countDocuments({ postId });
+
+    const uniqueUsers = await View.distinct("userId", {
+      postId,
+      userId: { $ne: null },
+    });
+    const uniqueIps = await View.distinct("ip", { postId, userId: null });
+
+    return NextResponse.json({
+      message: "آمار بازدید با موفقیت دریافت شد",
+      data: {
+        totalViews,
+        uniqueUserCount: uniqueUsers.length,
+        uniqueIpCount: uniqueIps.length,
+      },
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { message: "خطا در دریافت آمار بازدید", error: error?.message },
+      { status: 500 },
+    );
+  }
+};
 
 export const POST = async (
   req: NextRequest,

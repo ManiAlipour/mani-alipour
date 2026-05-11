@@ -1,4 +1,3 @@
-import React from "react";
 import RootProvider from "../providers";
 import Header from "../sections/Header";
 

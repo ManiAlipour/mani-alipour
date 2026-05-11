@@ -1,26 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { withAuth, type AuthRequest } from "@/lib/middleware/auth";
+import { NextRequest } from "next/server";
+import { authMiddleware, type AuthRequest } from "@/lib/middleware/auth";
 
-export function withAdmin(
-  handler: (req: NextRequest, ...args: any[]) => Promise<NextResponse>,
-) {
-  return withAuth(async (req: NextRequest, ...args: any[]) => {
-    const authReq = req as AuthRequest;
-
-    if (!authReq.user) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized: User info missing" },
-        { status: 401 },
-      );
-    }
-
-    if (authReq.user.role !== "admin") {
-      return NextResponse.json(
-        { success: false, message: "Forbidden: Admins only" },
-        { status: 403 },
-      );
-    }
-
-    return handler(req, ...args);
-  });
+export async function isAdmin(req: NextRequest) {
+  await authMiddleware(req);
+  const user = (req as NextRequest & AuthRequest).user;
+  return !!(user && user.role === "admin");
 }

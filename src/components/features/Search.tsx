@@ -3,24 +3,34 @@ import { useState, useRef, useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
 import { FaTimes } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import { useOnClickOutside } from "iso-hooks";
 
 export default function Search() {
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false); // search open state
+  const [open, setOpen] = useState(false);
   const [results, setResults] = useState<string[]>([]);
   const [isHovering, setIsHovering] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [highlighted, setHighlighted] = useState<number>(-1);
 
-  // Close search if clicking outside overlay (input OR dropdown)
-  useOnClickOutside(containerRef, () => {
-    setOpen(false);
-    setHighlighted(-1);
-    setResults([]);
-    setQuery("");
-  });
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        open &&
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+        setHighlighted(-1);
+        setResults([]);
+        setQuery("");
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
 
   // Dynamic filter (simulate debounce)
   useEffect(() => {
@@ -157,7 +167,11 @@ export default function Search() {
                       initial={{ scale: 0.5, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0.5, opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 21 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 21,
+                      }}
                       onClick={() => {
                         setQuery("");
                         setResults([]);

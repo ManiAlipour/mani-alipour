@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
 import AuthButton from "../features/AuthButton";
 import Search from "../features/Search";
-import { useMediaQuery } from "iso-hooks";
 
 export default function Header() {
   const links = [
@@ -20,13 +19,23 @@ export default function Header() {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
-
-  // Auto close mobile nav when resizing to desktop
   useEffect(() => {
-    if (isDesktop && mobileOpen) setMobileOpen(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDesktop, mobileOpen]);
+    // Handler checks screen width and closes mobile menu if now in desktop
+    function handleResize() {
+      if (window.innerWidth >= 1024 && mobileOpen) {
+        setMobileOpen(false);
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+
+    // Also run once on mount in case SSR hydration mismatch
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [mobileOpen]);
 
   return (
     <header

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAdmin } from "@/lib/middleware/admin";
 import { connectDB } from "@/lib/mongodb";
 import Tag from "@/models/Tag";
 import { createTagSchema } from "@/lib/validators/tag.validator";

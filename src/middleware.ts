@@ -5,7 +5,6 @@ import { verifyJWT } from "@/utils/jwt";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-
   const publicPaths = [
     "/",
     "/login",
@@ -27,7 +26,7 @@ export async function middleware(req: NextRequest) {
   try {
     const decoded = verifyJWT(token);
 
-    if (pathname.startsWith("/admin") && decoded.role !== "admin") {
+    if (pathname.startsWith("/admin") && decoded && decoded.role !== "admin") {
       return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
 

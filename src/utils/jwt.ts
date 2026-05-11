@@ -15,7 +15,7 @@ export function signJWT(
   return jwt.sign(payload, JWT_SECRET, { expiresIn });
 }
 
-export function verifyJWT(token: string): JWTPayload {
+export function verifyJWT(token: string): JWTPayload | null {
   try {
     return jwt.verify(token, JWT_SECRET) as JWTPayload;
   } catch {

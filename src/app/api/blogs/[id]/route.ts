@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { deleteBlogService, getBlogBySlugService, updateBlogService } from "@/services/blog.service";
-import { withAdmin } from "@/lib/middleware/admin";
+import {
+  deleteBlogService,
+  getBlogBySlugService,
+  updateBlogService,
+} from "@/services/blog.service";
+import { isAdmin } from "@/lib/middleware/admin";
 import { updateBlogSchema } from "@/lib/validators/blog.validator";
 
 // Handles GET request for fetching a single blog by slug
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     await connectDB();
-    const { id: slug } = await params;
+    const { id: slug } = await context.params;
 
     if (!slug) {
       return NextResponse.json(
@@ -38,73 +42,95 @@ export async function GET(
   }
 }
 
-// PUT (update blog) - only admin
-export const PUT = withAdmin(
-  async (req: NextRequest, { params }: { params: { id: string } }) => {
-    try {
-      await connectDB();
-      const { id } = params;
-      const body = await req.json();
+// PUT - only admin
+export const PUT = async (
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) => {
+  try {
+    const admin = isAdmin(req);
 
-      const parseResult = updateBlogSchema.safeParse(body);
-      if (!parseResult.success) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: "Validation failed",
-            errors: parseResult.error.issues,
-          },
-          { status: 400 },
-        );
-      }
-
-      const updatedBlog = await updateBlogService(id, parseResult.data);
-
-      if (!updatedBlog) {
-        return NextResponse.json(
-          { success: false, message: "Blog not found or update failed" },
-          { status: 404 },
-        );
-      }
-
+    if (!admin)
       return NextResponse.json(
-        { success: true, data: updatedBlog },
-        { status: 200 },
+        {
+          message: "دسترسی نامعتبر",
+        },
+        { status: 401 },
       );
-    } catch (error: any) {
+
+    await connectDB();
+    const { id } = await context.params;
+    const body = await req.json();
+
+    const parseResult = updateBlogSchema.safeParse(body);
+    if (!parseResult.success) {
       return NextResponse.json(
-        { success: false, message: error?.message || "Failed to update blog" },
-        { status: 500 },
+        {
+          success: false,
+          message: "Validation failed",
+          errors: parseResult.error.issues,
+        },
+        { status: 400 },
       );
     }
-  },
-);
+
+    const updatedBlog = await updateBlogService(id, parseResult.data);
+
+    if (!updatedBlog) {
+      return NextResponse.json(
+        { success: false, message: "Blog not found or update failed" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json(
+      { success: true, data: updatedBlog },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, message: error?.message || "Failed to update blog" },
+      { status: 500 },
+    );
+  }
+};
 
 // DELETE blog - only admin
-export const DELETE = withAdmin(
-  async (req: NextRequest, { params }: { params: { id: string } }) => {
-    try {
-      await connectDB();
-      const { id } = params;
+export const DELETE = async (
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) => {
+  try {
+    const admin = isAdmin(req);
 
-      const deletedBlog = await deleteBlogService(id);
-
-      if (!deletedBlog) {
-        return NextResponse.json(
-          { success: false, message: "Blog not found or delete failed" },
-          { status: 404 },
-        );
-      }
-
+    if (!admin)
       return NextResponse.json(
-        { success: true, message: "Blog deleted successfully" },
-        { status: 200 },
+        {
+          message: "دسترسی نامعتبر",
+        },
+        { status: 401 },
       );
-    } catch (error: any) {
+
+    await connectDB();
+    const { id } = await context.params;
+
+    const deletedBlog = await deleteBlogService(id);
+
+    if (!deletedBlog) {
       return NextResponse.json(
-        { success: false, message: error?.message || "Failed to delete blog" },
-        { status: 500 },
+        { success: false, message: "Blog not found or delete failed" },
+        { status: 404 },
       );
     }
-  },
-);
+
+    return NextResponse.json(
+      { success: true, message: "Blog deleted successfully" },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, message: error?.message || "Failed to delete blog" },
+      { status: 500 },
+    );
+  }
+};

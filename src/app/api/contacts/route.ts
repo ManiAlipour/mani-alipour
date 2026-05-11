@@ -3,13 +3,11 @@ import { connectDB } from "@/lib/mongodb";
 import { addContactSchema } from "@/lib/validators/contact.validator";
 import { createContact, getContacts } from "@/services/contact.service";
 
-// GET: لیست کانتکت‌ها با قابلیت فیلتر و صفحه‌بندی
 export const GET = async (req: NextRequest) => {
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);
 
-    // پارامترهای اختیاری
     const limit = Number(searchParams.get("limit")) || 20;
     const offset = Number(searchParams.get("offset")) || 0;
     const status = searchParams.get("status");
@@ -48,7 +46,6 @@ export const GET = async (req: NextRequest) => {
   }
 };
 
-// POST: افزودن پیام جدید
 export const POST = async (req: NextRequest) => {
   try {
     await connectDB();

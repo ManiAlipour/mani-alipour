@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import Project from "@/models/Projects";
 import { connectDB } from "@/lib/mongodb";
+import { isAdmin } from "@/lib/middleware/admin";
 
 export const GET = async (req: NextRequest) => {
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);
-    
+
     // Filters: ?q=search&isPublished=true&featured=true&status=done, etc.
     const filters: any = {};
     if (searchParams.has("q")) {
@@ -58,9 +59,18 @@ export const GET = async (req: NextRequest) => {
   }
 };
 
-// POST /api/pojects - Create a new project
 export const POST = async (req: NextRequest) => {
   try {
+    const admin = isAdmin(req);
+
+    if (!admin)
+      return NextResponse.json(
+        {
+          message: "دسترسی نامعتبر",
+        },
+        { status: 401 },
+      );
+
     await connectDB();
     const body = await req.json();
 
