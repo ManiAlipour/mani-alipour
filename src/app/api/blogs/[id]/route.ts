@@ -1,8 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { deleteBlogService, updateBlogService } from "@/services/blog.service";
+import { deleteBlogService, getBlogBySlugService, updateBlogService } from "@/services/blog.service";
 import { withAdmin } from "@/lib/middleware/admin";
 import { updateBlogSchema } from "@/lib/validators/blog.validator";
+
+// Handles GET request for fetching a single blog by slug
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    await connectDB();
+    const { id: slug } = await params;
+
+    if (!slug) {
+      return NextResponse.json(
+        { success: false, message: "Slug is required" },
+        { status: 400 },
+      );
+    }
+
+    const blog = await getBlogBySlugService(slug);
+
+    if (!blog) {
+      return NextResponse.json(
+        { success: false, message: "Blog not found" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({ success: true, data: blog }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, message: error?.message || "Failed to fetch blog" },
+      { status: 500 },
+    );
+  }
+}
 
 // PUT (update blog) - only admin
 export const PUT = withAdmin(
