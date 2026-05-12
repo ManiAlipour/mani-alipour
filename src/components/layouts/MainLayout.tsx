@@ -1,4 +1,5 @@
 import RootProvider from "../providers";
+import Footer from "../sections/Footer";
 import Header from "../sections/Header";
 
 export default function MainLayout({
@@ -11,6 +12,7 @@ export default function MainLayout({
       <div>
         <Header />
         {children}
+        <Footer />
       </div>
     </RootProvider>
   );
