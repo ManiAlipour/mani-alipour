@@ -104,30 +104,34 @@ export default function AboutSection() {
           </div>
 
           {/* Profile */}
-          <div className="w-full md:w-1/3 flex flex-col items-center md:items-end py-6 sm:py-10 px-2 sm:px-4 md:px-0 relative">
-            <div className="relative group mb-2">
-              <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-cyan-700 bg-gradient-to-br from-cyan-500/30 to-indigo-500/30 p-1 shadow-2xl overflow-hidden group-hover:-rotate-2 transition-all duration-300">
-                <img
-                  src="/images/profile.png"
-                  alt="Ali Manialipour"
-                  loading="lazy"
-                  className="w-full h-full object-cover rounded-full"
-                  style={{ objectPosition: "center 22%" }}
-                />
+          <div className="w-full md:w-1/3 flex flex-col items-center md:block py-6 sm:py-10 px-2 sm:px-4 md:px-0 relative">
+            <div className="relative flex flex-col items-center md:items-start">
+              <div className="relative group mb-2 md:mb-4 flex justify-center md:justify-end">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-cyan-700 bg-gradient-to-br from-cyan-500/30 to-indigo-500/30 p-1 shadow-2xl overflow-hidden group-hover:-rotate-2 transition-all duration-300 flex-shrink-0">
+                  <img
+                    src="/images/profile.png"
+                    alt="Ali Manialipour"
+                    loading="lazy"
+                    className="w-full h-full object-cover rounded-full"
+                    style={{ objectPosition: "center 22%" }}
+                  />
+                </div>
+                <span className="absolute bottom-2 left-[-14px] sm:left-[-18px] bg-gradient-to-r from-cyan-500 to-indigo-500 px-3 sm:px-4 py-1.5 sm:py-2 text-white font-black tracking-wider text-base sm:text-lg rounded-full shadow-lg rotate-3 animate-bounce select-none pointer-events-none">
+                  🙂
+                </span>
               </div>
-              <span className="absolute bottom-2 -right-3 bg-gradient-to-r from-cyan-500 to-indigo-500 px-3 sm:px-4 py-1.5 sm:py-2 text-white font-black tracking-wider text-base sm:text-lg rounded-full shadow-lg rotate-3 animate-bounce">
-                🙂
-              </span>
-            </div>
-            <div className="mt-2 sm:mt-3 text-center md:text-right space-y-1 sm:space-y-2 و-full">
-              <h2 className="text-white text-[1.25rem] sm:text-2xl font-extrabold mb-1 drop-shadow-cyan">
-                مانی علیپور
-              </h2>
-              <span className="inline-block bg-cyan-600/20 border border-cyan-400/30 rounded-xl px-2.5 sm:px-3 py-1 text-cyan-200 text-xs shadow">
-                عاشق یادگیری و ساختن چیزهای جدید!
-              </span>
+              <div className="mt-2 sm:mt-3 w-full flex flex-col items-center md:items-start space-y-1 sm:space-y-2">
+                <h2 className="text-white text-[1.25rem] sm:text-2xl font-extrabold mb-1 drop-shadow-cyan text-center md:text-right w-full">
+                  مانی علیپور
+                </h2>
+                <span className="inline-block bg-cyan-600/20 border border-cyan-400/30 rounded-xl 
+                px-2.5 sm:px-3 py-1 text-cyan-200 text-xs shadow text-center md:text-right">
+                  عاشق یادگیری و ساختن چیزهای جدید!
+                </span>
+              </div>
             </div>
           </div>
+    
         </div>
 
         {/* Tech stack showcase */}
