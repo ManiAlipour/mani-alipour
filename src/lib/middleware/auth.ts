@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export type AuthRequest = NextRequest & {
   user?: {
@@ -9,19 +9,21 @@ export type AuthRequest = NextRequest & {
 };
 
 export async function authMiddleware(req: NextRequest): Promise<AuthRequest> {
-  const authHeader = req.headers.get("authorization");
+  // Expect HttpOnly cookie "token" to be present
+  const cookieHeader = req.headers.get("cookie") || "";
+  const tokenMatch = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new Error("Unauthorized: No token provided");
+  if (!tokenMatch) {
+    throw new Error("Unauthorized: No token cookie provided");
   }
 
-  const token = authHeader.replace("Bearer ", "").trim();
+  const token = decodeURIComponent(tokenMatch[1]);
 
   const { verifyJWT } = await import("@/utils/jwt");
   const user = await verifyJWT(token);
 
   if (!user) {
-    throw new Error("Unauthorized: Invalid or expired token");
+    throw new Error("Unauthorized: Invalid or expired token (cookie)");
   }
 
   (req as AuthRequest).user = user;
