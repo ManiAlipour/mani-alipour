@@ -82,6 +82,9 @@ html {
   }
 }
 
+.bg-linear-to-br-darksite {
+  background: linear-gradient(125deg, #05233a 12%, #102230 81%, #05233a 100%);
+}
 .animate-sparkle {
   animation: sparkle 1.8s infinite linear;
   will-change: transform, filter, opacity;
