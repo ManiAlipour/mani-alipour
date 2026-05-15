@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const projectStatusesAgg = await Project.aggregate([
       {
         $group: {
-          _id: "$status", // مثلا: in progress, finished, archived
+          _id: "$status", 
           count: { $sum: 1 },
         },
       },
