@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import Tag from "@/models/Tag";
 import { createTagSchema } from "@/lib/validators/tag.validator";
 
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   try {
     await connectDB();
 
@@ -54,17 +54,18 @@ export const POST = async (req: NextRequest) => {
       slug: data.slug,
       ...(data.description && { description: data.description }),
     });
-    NextResponse.json(
+   return NextResponse.json(
       {
         messsage: "تگ با موفقیت ثبت شد",
         data: tag,
       },
       { status: 201 },
     );
-  } catch (error) {
+  } catch (_) {
     return NextResponse.json(
       {
         message: "خطا در ارتباط با سرور",
+
       },
       { status: 500 },
     );

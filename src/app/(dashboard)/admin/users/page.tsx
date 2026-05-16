@@ -222,12 +222,12 @@ export default function UsersPage() {
 
   if (usersResponse.error || usersAnalyticsResponse.error)
     return (
-      <div className="text-4xl flex flex-col items-center justify-center gap-10 h-full w-full">
-        <IoWarning className="text-8xl text-yellow-400 drop-shadow-xl animate-bounce" />
+      <div className="flex flex-col items-center justify-center w-full h-full gap-10 text-4xl">
+        <IoWarning className="text-yellow-400 text-8xl drop-shadow-xl animate-bounce" />
         <span>خطا در بارگزاری کاربران!</span>
-        <div className="flex justify-center gap-10 items-center text-base">
+        <div className="flex items-center justify-center gap-10 text-base">
           <button
-            className="bg-gradient-to-l from-pink-400/90 to-neon-blue/90 shadow-lg rounded-xl px-6 py-3 text-black font-bold cursor-pointer hover:scale-105 hover:bg-neon-blue/80 transition-all duration-300"
+            className="px-6 py-3 font-bold text-black transition-all duration-300 shadow-lg cursor-pointer bg-gradient-to-l from-pink-400/90 to-neon-blue/90 rounded-xl hover:scale-105 hover:bg-neon-blue/80"
             onClick={() => router.refresh()}
           >
             بارگزاری مجدد
@@ -238,9 +238,9 @@ export default function UsersPage() {
 
   if (usersResponse.loading || usersAnalyticsResponse.loading)
     return (
-      <div className="flex flex-col items-center justify-center gap-8 h-full w-full text-xl text-cyan-100">
-        <div className="w-16 h-16 border-4 border-neon-blue border-t-pink-300 border-b-green-400 border-r-yellow-300 border-l-transparent rounded-full animate-spin mb-4"></div>
-        <span className="text-lg text-gradient bg-gradient-to-l from-cyan-200 via-pink-400 to-neon-blue bg-clip-text text-transparent font-bold animate-pulse">
+      <div className="flex flex-col items-center justify-center w-full h-full gap-8 text-xl text-cyan-100">
+        <div className="w-16 h-16 mb-4 border-4 rounded-full border-neon-blue border-t-pink-300 border-b-green-400 border-r-yellow-300 border-l-transparent animate-spin"></div>
+        <span className="text-lg font-bold text-transparent text-gradient bg-gradient-to-l from-cyan-200 via-pink-400 to-neon-blue bg-clip-text animate-pulse">
           در حال دریافت اطلاعات...
         </span>
       </div>
@@ -263,38 +263,36 @@ export default function UsersPage() {
     : { data: { labels: [], datasets: [] }, options: {} };
 
   return (
-    <div className="flex flex-col gap-10 animate-fade-in pb-12">
+    <div className="flex flex-col gap-10 pb-12 animate-fade-in">
       <div
-        className="flex items-center gap-4 text-3xl font-extrabold bg-linear-to-l from-neon-blue via-cyan-100 to-neon-green
-         bg-clip-text text-transparent pb-2"
+        className="flex items-center gap-4 pb-2 text-3xl font-extrabold text-transparent bg-linear-to-l from-neon-blue via-cyan-100 to-neon-green bg-clip-text"
         style={{ letterSpacing: "-1.5px" }}
       >
         <RiUserSettingsLine className="animate-pulse drop-shadow-[0_0_14px_#23ff8a99]" />
         مدیریت کاربران
       </div>
       {usersAnalytics && (
-        <section className="grid grid-cols-1 md:grid-cols-5 gap-7 w-full">
+        <section className="grid w-full grid-cols-1 md:grid-cols-5 gap-7">
           <div className="md:col-span-3 bg-linear-to-br from-cyan-900/80 to-sky-900/90 rounded-2xl p-8 shadow-xl border border-cyan-900/25 flex flex-col items-center min-h-[380px] relative overflow-hidden">
-            <span className="absolute -top-11 -left-10 rounded-full w-56 h-56 bg-cyan-500/10 blur-2xl z-0" />
+            <span className="absolute z-0 w-56 h-56 rounded-full -top-11 -left-10 bg-cyan-500/10 blur-2xl" />
             <h3 className="mb-2 font-bold text-xl text-cyan-100 flex items-center gap-2 drop-shadow-[0_2px_8px_#41aceb88]">
               <FaCalendarAlt className="text-cyan-100/80" />
               ثبت‌نام کاربران طی ماه‌های اخیر
             </h3>
-            <div className="w-full flex-1 flex items-end justify-center z-10 pt-3 pr-0">
+            <div className="z-10 flex items-end justify-center flex-1 w-full pt-3 pr-0">
               {/* ری‌یوز چارت بار */}
               <BarChart
                 data={barChartConfig.data}
                 options={barChartConfig.options}
-                className="max-h-80 w-full"
+                className="w-full max-h-80"
                 emptyMessage="آماری یافت نشد."
               />
             </div>
           </div>
           <div
-            className="md:col-span-2 flex flex-col justify-center items-center bg-linear-to-br from-indigo-950/60
-           to-cyan-950/85 rounded-2xl p-8 shadow-xl border border-cyan-900/25 relative overflow-hidden"
+            className="relative flex flex-col items-center justify-center p-8 overflow-hidden border shadow-xl md:col-span-2 bg-linear-to-br from-indigo-950/60 to-cyan-950/85 rounded-2xl border-cyan-900/25"
           >
-            <span className="absolute bottom-2 left-0 w-32 h-24 rounded-full bg-teal-400/10 blur-2xl z-0" />
+            <span className="absolute left-0 z-0 w-32 h-24 rounded-full bottom-2 bg-teal-400/10 blur-2xl" />
             <h3 className="mb-2 font-bold text-xl text-cyan-100 drop-shadow-[0_2px_10px_#12fbd099]">
               ترکیب کاربران
             </h3>
@@ -305,29 +303,29 @@ export default function UsersPage() {
                 emptyMessage="آماری وجود ندارد."
               />
             </div>
-            <div className="flex justify-center items-center gap-3 md:gap-4 mt-6 w-full flex-wrap">
+            <div className="flex flex-wrap items-center justify-center w-full gap-3 mt-6 md:gap-4">
               <StatCard
                 label="کل کاربران"
                 count={usersAnalytics.totalUsers}
-                icon={<FaUserPlus className="text-green-400 text-xl" />}
+                icon={<FaUserPlus className="text-xl text-green-400" />}
                 gradient="from-green-400/90 to-lime-400/80"
               />
               <StatCard
                 label="ادمین"
                 count={usersAnalytics.adminCount}
-                icon={<FaUserShield className="text-blue-400 text-xl" />}
+                icon={<FaUserShield className="text-xl text-blue-400" />}
                 gradient="from-blue-400/80 to-cyan-300/80"
               />
               <StatCard
                 label="فعال"
                 count={usersAnalytics.activeUsers}
-                icon={<FaUser className="text-violet-400 text-xl" />}
+                icon={<FaUser className="text-xl text-violet-400" />}
                 gradient="from-indigo-400/70 to-blue-200/80"
               />
               <StatCard
                 label="غیرفعال"
                 count={usersAnalytics.inactiveUsers}
-                icon={<FaUserAltSlash className="text-rose-500 text-xl" />}
+                icon={<FaUserAltSlash className="text-xl text-rose-500" />}
                 gradient="from-rose-300/90 to-pink-100/70"
               />
             </div>
@@ -339,21 +337,21 @@ export default function UsersPage() {
       {usersAnalytics &&
         usersAnalytics.latestUsers &&
         usersAnalytics.latestUsers.length > 0 && (
-          <section className="bg-gradient-to-br from-blue-950/90 to-cyan-950/70 rounded-2xl p-7 shadow-xl border border-cyan-900/25 relative overflow-hidden">
-            <span className="absolute -bottom-5 -left-14 rounded-full w-48 h-40 bg-neon-blue/10 blur-2xl z-0" />
+          <section className="relative overflow-hidden border shadow-xl bg-gradient-to-br from-blue-950/90 to-cyan-950/70 rounded-2xl p-7 border-cyan-900/25">
+            <span className="absolute z-0 w-48 h-40 rounded-full -bottom-5 -left-14 bg-neon-blue/10 blur-2xl" />
             <div className="font-bold text-xl mb-6 flex items-center gap-2 bg-gradient-to-l from-neon-blue/70 via-cyan-100/80 to-neon-green/60 bg-clip-text text-transparent drop-shadow-[0_5px_18px_#60aaff88]">
               <FaUser className="text-neon-blue" />
               جدیدترین کاربران ثبت شده
             </div>
 
-            <div className="block md:hidden space-y-3">
+            <div className="block space-y-3 md:hidden">
               {usersAnalytics.latestUsers.map((user) => (
                 <UserMobileCard user={user} key={user._id} />
               ))}
             </div>
             {/* برای دسکتاپ: جدول */}
-            <div className="hidden md:block overflow-x-auto rounded-xl shadow-inner">
-              <table className="w-full border-separate border-spacing-y-1 text-base font-normal">
+            <div className="hidden overflow-x-auto shadow-inner md:block rounded-xl">
+              <table className="w-full text-base font-normal border-separate border-spacing-y-1">
                 <thead>
                   <tr className="bg-gradient-to-l from-cyan-900/75 to-cyan-950/85">
                     <th className="px-5 py-3 rounded-r-lg">نام</th>
@@ -391,14 +389,14 @@ export default function UsersPage() {
         )}
 
       {/* All Users */}
-      <section className="bg-gradient-to-br from-cyan-900/90 to-sky-900/80 rounded-2xl p-7 shadow-xl border border-cyan-900/25 transition">
+      <section className="transition border shadow-xl bg-gradient-to-br from-cyan-900/90 to-sky-900/80 rounded-2xl p-7 border-cyan-900/25">
         <div className="font-bold text-xl mb-5 flex items-center gap-2 bg-gradient-to-l from-neon-blue/90 via-cyan-100 to-neon-green/60 bg-clip-text text-transparent drop-shadow-[0_5px_14px_#44ddff77]">
           <FaUser className="text-cyan-200" />
           لیست کامل کاربران ({users.length})
         </div>
-        <div className="block md:hidden space-y-3">
+        <div className="block space-y-3 md:hidden">
           {users.length === 0 ? (
-            <div className="text-center py-6 text-cyan-300 bg-cyan-950/80 rounded-xl">
+            <div className="py-6 text-center text-cyan-300 bg-cyan-950/80 rounded-xl">
               کاربری ثبت نشده است.
             </div>
           ) : (
@@ -413,8 +411,8 @@ export default function UsersPage() {
           )}
         </div>
 
-        <div className="hidden md:block overflow-x-auto rounded-xl shadow-inner">
-          <table className="w-full border-separate border-spacing-y-1 text-base font-normal">
+        <div className="hidden overflow-x-auto shadow-inner md:block rounded-xl">
+          <table className="w-full text-base font-normal border-separate border-spacing-y-1">
             <thead>
               <tr className="bg-gradient-to-l from-cyan-900/70 to-cyan-950/85">
                 <th className="px-3 py-3 rounded-r-xl">#</th>
@@ -430,7 +428,7 @@ export default function UsersPage() {
                 <tr>
                   <td
                     colSpan={6}
-                    className="text-center py-6 text-cyan-300 bg-cyan-950/80 rounded-xl"
+                    className="py-6 text-center text-cyan-300 bg-cyan-950/80 rounded-xl"
                   >
                     کاربری ثبت نشده است.
                   </td>
@@ -490,19 +488,19 @@ function UserMobileCard({
   adminAction?: boolean;
 }) {
   return (
-    <div className="rounded-xl bg-gradient-to-l from-blue-950/80 to-cyan-900/60 shadow p-4 flex flex-col gap-3 text-xs relative overflow-hidden border border-sky-800/50">
+    <div className="relative flex flex-col gap-3 p-4 overflow-hidden text-xs border shadow rounded-xl bg-gradient-to-l from-blue-950/80 to-cyan-900/60 border-sky-800/50">
       {typeof index === "number" && (
-        <span className="absolute left-2 top-2 text-xs text-cyan-400 bg-cyan-950/60 rounded-full w-8 h-8 flex items-center justify-center font-black ring-2 ring-blue-700/60">
+        <span className="absolute flex items-center justify-center w-8 h-8 text-xs font-black rounded-full left-2 top-2 text-cyan-400 bg-cyan-950/60 ring-2 ring-blue-700/60">
           {index}
         </span>
       )}
-      <div className="flex gap-2 flex-col sm:flex-row items-center sm:items-start justify-between">
+      <div className="flex flex-col items-center justify-between gap-2 sm:flex-row sm:items-start">
         <div className="flex flex-col flex-1 min-w-0">
-          <span className="text-sm flex items-center gap-1 font-bold text-cyan-100 truncate">
+          <span className="flex items-center gap-1 text-sm font-bold truncate text-cyan-100">
             <FaUser className="text-cyan-400" />
             {user.name}
           </span>
-          <span className="mt-1 flex gap-1 text-cyan-200 font-mono break-all sm:break-normal">
+          <span className="flex gap-1 mt-1 font-mono break-all text-cyan-200 sm:break-normal">
             {user.email}
           </span>
         </div>

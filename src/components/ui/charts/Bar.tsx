@@ -1,6 +1,15 @@
-// --- قابل استفاده‌ی مجدد: کامپوننت BarChart ---
-
 import { Bar } from "react-chartjs-2";
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 /**
  * @param data Full data object according to chart.js
@@ -20,7 +29,7 @@ export default function BarChart({
   emptyMessage?: string;
 }) {
   if (!data || !data.labels || !data.labels.length)
-    return <div className="text-cyan-200 mt-12 text-lg">{emptyMessage}</div>;
+    return <div className="mt-12 text-lg text-cyan-200">{emptyMessage}</div>;
   return (
     <Bar
       data={data}

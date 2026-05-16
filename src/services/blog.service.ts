@@ -1,6 +1,8 @@
 import Blog from "@/models/Blog";
 import { CreateBlogInput } from "@/lib/validators/blog.validator";
 import { UpdateBlogInput } from "@/lib/validators/blog.validator";
+import "@/models/User";
+import "@/models/Tag";
 
 export async function createBlogService(
   data: CreateBlogInput,

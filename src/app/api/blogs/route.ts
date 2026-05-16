@@ -6,14 +6,18 @@ import { AuthRequest } from "@/lib/middleware/auth";
 import { isAdmin } from "@/lib/middleware/admin";
 
 // Handles GET requests for fetching blogs
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     await connectDB();
     const blogs = await getBlogsService();
     return NextResponse.json({ success: true, data: blogs }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, message: error?.message || "Failed to fetch blogs" },
+      {
+        success: false,
+        message: error?.message || "Failed to fetch blogs",
+        error: error.message,
+      },
       { status: 500 },
     );
   }

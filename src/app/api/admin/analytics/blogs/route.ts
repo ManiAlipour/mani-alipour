@@ -21,8 +21,10 @@ export const GET = async (req: NextRequest) => {
     const totalBlogs = await Blog.countDocuments();
 
     // Published / Draft Blogs Count
-    const publishedBlogs = await Blog.countDocuments({ status: "published" });
-    const draftBlogs = await Blog.countDocuments({ status: "draft" });
+    const publishedBlogs = await Blog.countDocuments({
+      isPublished: true,
+    });
+    const draftBlogs = await Blog.countDocuments({ isPublished: false });
 
     // Blogs by Author Count
     // Group by Author and count blogs
