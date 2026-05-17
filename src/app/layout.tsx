@@ -26,12 +26,9 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <body
-        // Delete the bg-slate-950 which forces a flat color and
-        // add a background gradient more consistent with the primary sections.
         className="bg-gradient-to-br from-cyan-950 via-slate-900 to-cyan-950 text-white font-yekan"
         style={{
           minHeight: "100dvh",
-          // Make sure background applies to the full viewport and matches HeroSection
         }}
       >
         <MainLayout>{children}</MainLayout>

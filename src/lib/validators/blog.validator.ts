@@ -10,6 +10,7 @@ export const createBlogSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "Slug فقط می‌تواند شامل حروف کوچک، عدد و - باشد"),
 
   content: z.string().min(50, "محتوا خیلی کوتاه است"),
+  excerpt: z.string(),
 
   cover: z.string().url().optional(),
 

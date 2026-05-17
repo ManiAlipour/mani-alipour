@@ -36,7 +36,7 @@ export default function AdminLayout({
       {/* Main Content */}
       <div
         className={`
-          flex flex-col flex-1 min-w-0 transition-all duration-300
+          flex flex-col flex-1 transition-all duration-300
           ${isDesktop ? "lg:mr-72" : "mr-0"}
         `}
       >
@@ -44,17 +44,17 @@ export default function AdminLayout({
         <AdminHeader {...props} />
 
         {/* Container */}
-        <div className="flex-1 p-4 md:p-8">
+        <div className="flex-1 md:p-8">
           <div
             className="
               rounded-2xl shadow
               bg-linear-to-br-darksite dark:bg-linear-to-br-darksite
               border border-primary-100 dark:border-gray-800
-              min-h-[400px] h-full flex flex-col
+              min-h-lvh h-full flex flex-col
               transition-shadow relative
             "
           >
-            <main className="flex-1 w-full px-4 pt-4 pb-8">{children}</main>
+            <main className="flex-1 w-full pt-4 pb-8">{children}</main>
           </div>
         </div>
       </div>
