@@ -3,6 +3,7 @@ import { usePathname } from "next/navigation";
 import RootProvider from "../providers";
 import Footer from "../sections/Footer";
 import Header from "../sections/Header";
+import { Toaster } from "react-hot-toast";
 
 const HIDE_LAYOUT_PATHS = ["/auth", "/dashboard", "/admin"];
 
@@ -27,6 +28,7 @@ export default function MainLayout({
   return (
     <RootProvider>
       <div>
+        <Toaster />
         {!hideLayout && <Header />}
         {children}
         {!hideLayout && <Footer />}
