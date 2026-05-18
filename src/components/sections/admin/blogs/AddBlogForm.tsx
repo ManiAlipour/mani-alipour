@@ -10,6 +10,7 @@ import { FiEdit2, FiLink, FiFileText } from "react-icons/fi";
 import { HiDocumentText } from "react-icons/hi";
 import { BsImage } from "react-icons/bs";
 import { twMerge } from "tailwind-merge";
+import toast from "react-hot-toast";
 
 interface TagsResponse {
   message: string;
@@ -46,7 +47,11 @@ const validationSchema = yup.object({
   tags: yup.array().of(yup.string()).min(1, "حداقل یک برچسب انتخاب کنید"),
 });
 
-export default function AddBlogForm() {
+export default function AddBlogForm({
+  refetch,
+}: {
+  refetch: (overrideUrl?: string | null) => Promise<void>;
+}) {
   const tagsResponse = useFetch<TagsResponse>("/api/tags");
 
   const formik = useFormik({
@@ -73,14 +78,17 @@ export default function AddBlogForm() {
 
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));
-          alert(errorData?.message || "خطا در ثبت مقاله! لطفا دوباره تلاش کنید.");
+          alert(
+            errorData?.message || "خطا در ثبت مقاله! لطفا دوباره تلاش کنید.",
+          );
           return;
         }
 
-        alert("ثبت با موفقیت انجام شد!");
+        toast.success("ثبت با موفقیت انجام شد!");
         resetForm();
+        await refetch();
       } catch (error) {
-        alert("خطا در برقراری ارتباط با سرور");
+        toast.error("خطا در برقراری ارتباط با سرور");
       }
     },
   });

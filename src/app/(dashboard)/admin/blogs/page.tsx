@@ -4,8 +4,10 @@ import BlogsList from "@/components/sections/admin/blogs/BlogsList";
 import StatCard from "@/components/ui/cards/StatsCard";
 import BarChart from "@/components/ui/charts/Bar";
 import DoughnutChart from "@/components/ui/charts/Doughnut";
-import toPersianMonth, { normalizeMonthlyStats } from "@/utils/persianMonth";
+import { normalizeMonthlyStats } from "@/utils/persianMonth";
 import { useFetch } from "iso-hooks";
+import { useEffect, useRef } from "react";
+import toast from "react-hot-toast";
 
 import { FaCheckCircle, FaEye } from "react-icons/fa";
 import { LuBookText } from "react-icons/lu";
@@ -29,17 +31,18 @@ export default function BlogPage() {
     "/api/admin/analytics/blogs",
   );
 
-  if (blogsResponse.loading || blogsStatsResponse.loading)
+  useEffect(() => {
+    if (blogsResponse.loading) {
+      toast.loading("در حال بارگزاری...");
+    } else {
+      toast.dismiss();
+    }
+  }, [blogsResponse.loading]);
+
+  if (blogsStatsResponse.loading)
     return (
       <div className="flex items-center justify-center h-screen text-lg text-cyan-200">
         در حال بارگزاری ...
-      </div>
-    );
-
-  if (blogsResponse.error || blogsStatsResponse.error)
-    return (
-      <div className="flex items-center justify-center h-screen font-bold text-red-400">
-        خطایی رخ داده است!
       </div>
     );
 
@@ -219,11 +222,11 @@ export default function BlogPage() {
       </div>
 
       <div>
-        <AddBlogForm />
+        <AddBlogForm refetch={blogsResponse.refetch} />
       </div>
 
       <div>
-        <BlogsList blogs={blogs} />
+        <BlogsList blogs={blogs} refetch={blogsResponse.refetch} />
       </div>
     </div>
   );
