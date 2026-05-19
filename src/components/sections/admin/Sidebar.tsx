@@ -14,6 +14,7 @@ import {
 } from "react-icons/md";
 import { FiLogOut } from "react-icons/fi";
 import { BsStars } from "react-icons/bs";
+import Link from "next/link";
 
 interface ISidebarProps {
   isDesktop: boolean;
@@ -21,7 +22,6 @@ interface ISidebarProps {
   setSidebarOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-/* منو */
 const navItems = [
   {
     label: "داشبورد",
@@ -82,7 +82,6 @@ export default function AdminSidebar({
 }: ISidebarProps) {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // UX: close on Escape key (mobile only)
   useEffect(() => {
     if (!sidebarOpen || isDesktop) return;
     function handleKey(e: KeyboardEvent) {
@@ -92,11 +91,10 @@ export default function AdminSidebar({
     return () => window.removeEventListener("keydown", handleKey);
   }, [sidebarOpen, setSidebarOpen, isDesktop]);
 
-  // UX: focus trap (mobile sidebar)
   useEffect(() => {
     if (!sidebarOpen || isDesktop) return;
     const focusable = sidebarRef.current?.querySelectorAll<HTMLElement>(
-      'a,button,[tabindex]:not([tabindex="-1"])'
+      'a,button,[tabindex]:not([tabindex="-1"])',
     );
     if (!focusable?.length) return;
     const first = focusable[0],
@@ -113,8 +111,7 @@ export default function AdminSidebar({
     }
     sidebarRef.current?.addEventListener("keydown", trapFocus);
     first.focus();
-    return () =>
-      sidebarRef.current?.removeEventListener("keydown", trapFocus);
+    return () => sidebarRef.current?.removeEventListener("keydown", trapFocus);
   }, [sidebarOpen, isDesktop]);
 
   const closeSidebar = () => {
@@ -123,7 +120,6 @@ export default function AdminSidebar({
 
   return (
     <>
-      {/* Overlay موبایل */}
       {!isDesktop && sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md transition-opacity animate-fadein"
@@ -133,7 +129,6 @@ export default function AdminSidebar({
         />
       )}
 
-      {/* Sidebar */}
       <aside
         ref={sidebarRef}
         className={`
@@ -150,8 +145,8 @@ export default function AdminSidebar({
             isDesktop
               ? "translate-x-0"
               : sidebarOpen
-              ? "translate-x-0"
-              : "translate-x-full pointer-events-none"
+                ? "translate-x-0"
+                : "translate-x-full pointer-events-none"
           }
         `}
         tabIndex={-1}
@@ -181,9 +176,12 @@ export default function AdminSidebar({
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col gap-1.5 mt-6 px-3" aria-label="لینک های اصلی">
+        <nav
+          className="flex flex-col gap-1.5 mt-6 px-3"
+          aria-label="لینک های اصلی"
+        >
           {navItems.map(({ href, label, icon: Icon }) => (
-            <a
+            <Link
               key={href}
               href={href}
               onClick={closeSidebar}
@@ -205,7 +203,7 @@ export default function AdminSidebar({
                 <Icon className="w-5 h-5 text-cyan-300 group-hover:text-neon-green/90 transition-colors" />
               </span>
               <span className="truncate">{label}</span>
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -223,7 +221,10 @@ export default function AdminSidebar({
           >
             <div className="flex flex-col font-yekan">
               <span className="text-neon-green font-extrabold text-sm flex items-center gap-1">
-                خوش آمدید! <span aria-label="سلام" role="img">👋</span>
+                خوش آمدید!{" "}
+                <span aria-label="سلام" role="img">
+                  👋
+                </span>
               </span>
               <span className="text-xs text-cyan-300/90 mt-0.5">
                 مدیریت آسان و هوشمند
