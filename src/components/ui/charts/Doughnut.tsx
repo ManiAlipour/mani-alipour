@@ -47,7 +47,7 @@ export default function DoughnutChart({
     <Doughnut
       data={data}
       options={options}
-      className={`max-w-[280px] w-full ${className}`}
+      className={`!w-full !h-full ${className}`}
     />
   );
 }

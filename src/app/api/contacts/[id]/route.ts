@@ -1,3 +1,4 @@
+import { isAdmin } from "@/lib/middleware/admin";
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { updateContactSchema } from "@/lib/validators/contact.validator";
@@ -12,6 +13,9 @@ export const GET = async (
   { params }: { params: Promise<{ id: string }> },
 ) => {
   try {
+    if (!(await isAdmin(req))) {
+      return NextResponse.json({ message: "خطای دسترسی" }, { status: 401 });
+    }
     await connectDB();
     const { id } = await params;
 
@@ -44,6 +48,9 @@ export const PATCH = async (
   { params }: { params: Promise<{ id: string }> },
 ) => {
   try {
+    if (!(await isAdmin(req))) {
+      return NextResponse.json({ message: "خطای دسترسی" }, { status: 401 });
+    }
     await connectDB();
     const { id } = await params;
     const body = await req.json();
@@ -98,6 +105,9 @@ export const DELETE = async (
   { params }: { params: Promise<{ id: string }> },
 ) => {
   try {
+    if (!(await isAdmin(req))) {
+      return NextResponse.json({ message: "خطای دسترسی" }, { status: 401 });
+    }
     await connectDB();
     const { id } = await params;
 

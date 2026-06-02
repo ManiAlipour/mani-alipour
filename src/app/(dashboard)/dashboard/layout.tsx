@@ -1,9 +1,9 @@
-import React from "react";
+import UserLayout from "@/components/layouts/UserLayout";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <div>{children}</div>;
+  return <UserLayout>{children}</UserLayout>;
 }

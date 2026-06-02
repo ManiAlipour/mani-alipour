@@ -206,7 +206,8 @@ export default function SignIn() {
 
       if (res.ok) {
         setSuccess(data.message || "ورود با موفقیت انجام شد!");
-        router.replace("/")
+        const role = data.user?.role;
+        router.replace(role === "admin" ? "/admin" : "/dashboard");
       } else {
         setError(
           // Handle zod error string or backend message

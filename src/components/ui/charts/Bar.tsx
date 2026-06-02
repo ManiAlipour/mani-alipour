@@ -34,7 +34,7 @@ export default function BarChart({
     <Bar
       data={data}
       options={options}
-      className={`max-h-80 w-full ${className}`}
+      className={`!w-full !h-full ${className}`}
     />
   );
 }

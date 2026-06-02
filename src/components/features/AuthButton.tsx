@@ -3,8 +3,11 @@ import { FaUserAlt } from "react-icons/fa";
 import { FaSignOutAlt } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function AuthButton() {
+  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -98,15 +101,26 @@ export default function AuthButton() {
             flex flex-col"
         >
           <Link
-            href="/dashboard"
+            href={user.role === "admin" ? "/admin" : "/dashboard"}
             className="px-4 py-2 text-white hover:bg-cyan-900/40 transition-colors rounded-t-xl"
             onClick={() => setDropdownOpen(false)}
           >
-            داشبورد من
+            {user.role === "admin" ? "پنل مدیریت" : "داشبورد من"}
           </Link>
           <button
+            type="button"
             className="flex items-center gap-2 px-4 py-2 text-red-400 hover:bg-red-950/40 transition-colors rounded-b-xl w-full"
-            // onClick={handleLogout} // TODO: Implement logout
+            onClick={async () => {
+              try {
+                await fetch("/api/auth/logout", { method: "POST" });
+                setUser(null);
+                setDropdownOpen(false);
+                toast.success("خروج موفق");
+                router.replace("/auth/signin");
+              } catch {
+                toast.error("خطا در خروج");
+              }
+            }}
           >
             <FaSignOutAlt />
             خروج
