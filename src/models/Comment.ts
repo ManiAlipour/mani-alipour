@@ -7,7 +7,6 @@ export interface ICommentDocument extends Document {
   content: string;
   createdAt: Date;
   updatedAt: Date;
-  approved: boolean;
 }
 
 const commentSchema = new Schema<ICommentDocument>(
@@ -30,11 +29,6 @@ const commentSchema = new Schema<ICommentDocument>(
       type: String,
       required: true,
       trim: true,
-    },
-
-    approved: {
-      type: Boolean,
-      default: false,
     },
   },
   { timestamps: true },

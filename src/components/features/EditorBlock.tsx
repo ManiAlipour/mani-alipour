@@ -20,7 +20,7 @@ const EditorBlock = ({
 }: EditorBlockProps) => {
   const editor = useRef(null);
 
-  // Memoize config to avoid object recreation on each render
+
   const config = useMemo(
     () => ({
       readonly: readOnly,

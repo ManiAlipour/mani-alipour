@@ -4,8 +4,8 @@ import { getBlogsService, createBlogService } from "@/services/blog.service";
 import { createBlogSchema } from "@/lib/validators/blog.validator";
 import { AuthRequest } from "@/lib/middleware/auth";
 import { isAdmin } from "@/lib/middleware/admin";
+import Tag from "@/models/Tag";
 
-// Handles GET requests for fetching blogs
 export async function GET() {
   try {
     await connectDB();
@@ -59,6 +59,13 @@ export const POST = async (req: NextRequest) => {
     }
 
     const newBlog = await createBlogService(parseResult.data, user.userId);
+
+    const tags = await Tag.find({ _id: parseResult.data.tags });
+
+    tags.forEach(async (t) => {
+      t.postCount++;
+      await t.save();
+    });
 
     return NextResponse.json({ success: true, data: newBlog }, { status: 201 });
   } catch (error: any) {
