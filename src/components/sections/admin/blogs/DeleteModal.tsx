@@ -7,9 +7,18 @@ interface IModalProps {
   setOpen: (v: boolean) => void;
   onDelete: () => void;
   loading?: boolean;
+  title?: string;
+  message?: string;
 }
 
-export default function DeleteModal({ open, setOpen, onDelete, loading }: IModalProps) {
+export default function DeleteModal({
+  open,
+  setOpen,
+  onDelete,
+  loading,
+  title = "حذف مقاله",
+  message = "آیا مطمئن هستید که می‌خواهید این مقاله را حذف کنید؟ این عملیات قابل بازگشت نیست.",
+}: IModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   if (!open) return null;
@@ -24,10 +33,8 @@ export default function DeleteModal({ open, setOpen, onDelete, loading }: IModal
         className="bg-zinc-900 text-white rounded-2xl shadow-lg w-[90vw] max-w-sm p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="mb-4 text-lg font-bold text-red-400">حذف مقاله</h3>
-        <p className="mb-6 text-sm">
-          آیا مطمئن هستید که می‌خواهید این مقاله را حذف کنید؟ این عملیات قابل بازگشت نیست.
-        </p>
+        <h3 className="mb-4 text-lg font-bold text-red-400">{title}</h3>
+        <p className="mb-6 text-sm">{message}</p>
         <div className="flex justify-end gap-2">
           <button
             disabled={loading}

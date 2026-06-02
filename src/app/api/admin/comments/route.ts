@@ -24,9 +24,12 @@ export async function GET(req: NextRequest) {
 
     const [comments, totalComments] = await Promise.all([
       Comment.find(query)
+        .populate("userId", "name email")
+        .populate("postId", "title slug")
         .sort({ createdAt: -1 })
         .limit(limit)
-        .skip((page - 1) * limit),
+        .skip((page - 1) * limit)
+        .lean(),
       Comment.countDocuments(query),
     ]);
 
