@@ -22,21 +22,47 @@ export async function createBlogService(
   return blog;
 }
 
-export async function getBlogsService() {
-  const blogs = await Blog.find({ isPublished: true })
-    .populate("author", "name")
-    .populate("tags", "name slug")
-    .sort({ createdAt: -1 })
-    .lean();
+export async function getBlogsService(
+  limit: number,
+  page: number,
+  search?: string,
+) {
+  const query: any = { isPublished: true };
 
-  return blogs;
+  if (search && search.trim() !== "") {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { excerpt: { $regex: search, $options: "i" } },
+      { content: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [blogs, total] = await Promise.all([
+    Blog.find(query)
+      .skip(skip)
+      .limit(limit)
+      .populate("author", "name")
+      .populate("tags", "name slug")
+      .sort({ createdAt: -1 })
+      .lean(),
+    Blog.countDocuments(query),
+  ]);
+
+  return {
+    blogs,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 
 export async function getBlogBySlugService(slug: string) {
   const blog = await Blog.findOne({ slug, isPublished: true })
     .populate("author", "name")
     .populate("tags", "name slug")
-    .lean();
+  .lean();
 
   if (!blog) {
     throw new Error("مقاله پیدا نشد");

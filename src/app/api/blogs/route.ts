@@ -6,11 +6,32 @@ import { AuthRequest } from "@/lib/middleware/auth";
 import { isAdmin } from "@/lib/middleware/admin";
 import Tag from "@/models/Tag";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
+    const search = searchParams.get("search") || "";
+
     await connectDB();
-    const blogs = await getBlogsService();
-    return NextResponse.json({ success: true, data: blogs }, { status: 200 });
+    const result = await getBlogsService(limit, page, search);
+
+    const { blogs, total, totalPages } = result;
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: blogs,
+        pagination: {
+          total,
+          totalPages,
+          currentPage: page,
+          pageSize: limit,
+        },
+      },
+      { status: 200 },
+    );
   } catch (error: any) {
     return NextResponse.json(
       {
