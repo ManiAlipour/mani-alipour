@@ -26,6 +26,7 @@ export async function getBlogsService(
   limit: number,
   page: number,
   search?: string,
+  tag?: string,
 ) {
   const query: any = { isPublished: true };
 
@@ -35,6 +36,22 @@ export async function getBlogsService(
       { excerpt: { $regex: search, $options: "i" } },
       { content: { $regex: search, $options: "i" } },
     ];
+  }
+
+  if (tag && tag.trim() !== "") {
+    query["tags"] = { $exists: true, $ne: [] };
+
+    const Tag = require("@/models/Tag").default;
+    const foundTag = await Tag.findOne({ slug: tag }).select("_id");
+    if (!foundTag) {
+      return {
+        blogs: [],
+        total: 0,
+        page,
+        totalPages: 0,
+      };
+    }
+    query["tags"] = foundTag._id;
   }
 
   const skip = (page - 1) * limit;
@@ -62,7 +79,7 @@ export async function getBlogBySlugService(slug: string) {
   const blog = await Blog.findOne({ slug, isPublished: true })
     .populate("author", "name")
     .populate("tags", "name slug")
-  .lean();
+    .lean();
 
   if (!blog) {
     throw new Error("مقاله پیدا نشد");

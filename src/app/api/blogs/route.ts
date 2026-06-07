@@ -13,9 +13,10 @@ export async function GET(req: NextRequest) {
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
     const search = searchParams.get("search") || "";
+    const tag = searchParams.get("tag") || "";
 
     await connectDB();
-    const result = await getBlogsService(limit, page, search);
+    const result = await getBlogsService(limit, page, search, tag);
 
     const { blogs, total, totalPages } = result;
 
