@@ -99,7 +99,7 @@ export default function AddBlogForm({ refetch }: { refetch: any }) {
               ثبت مقاله جدید
             </h2>
             <p className="mt-1 text-xs text-gray-500">
-              مانی عزیز، اطلاعات رو با دقت وارد کن
+             اطلاعات رو با دقت وارد کنید
             </p>
           </div>
         </div>

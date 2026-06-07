@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json(
       {
-        message: "ورود با موفقیت انجام شد مانی جان!",
+        message: "ورود با موفقیت انجام شد!",
         user,
       },
       { status: 200 }

@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     const response = NextResponse.json(
       {
-        message: "ثبت‌نام با موفقیت انجام شد مانی جان!",
+        message: "ثبت‌نام با موفقیت انجام شد !",
         user,
       },
       { status: 201 },

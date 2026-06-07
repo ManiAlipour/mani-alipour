@@ -28,7 +28,7 @@ export default function BlogsList({
       const res = await fetch(`/api/blogs/${deletingId}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
       await refetch();
-      toast.success("مانی جان، مقاله با موفقیت حذف شد");
+      toast.success("  مقاله با موفقیت حذف شد");
       setOpenDeleteModal(false);
     } catch (err) {
       toast.error("خطا در حذف! دوباره تلاش کن");

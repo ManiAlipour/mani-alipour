@@ -184,7 +184,6 @@ export default function SignIn() {
 
   const router = useRouter();
 
-  // Handle actual login with credentials, calling /api/auth/login
   const handleLogin = async (
     values: { email: string; password: string },
     { setSubmitting }: { setSubmitting: (v: boolean) => void },
@@ -210,7 +209,6 @@ export default function SignIn() {
         router.replace(role === "admin" ? "/admin" : "/dashboard");
       } else {
         setError(
-          // Handle zod error string or backend message
           data.message ||
             (data.errors
               ? Array.isArray(data.errors)
