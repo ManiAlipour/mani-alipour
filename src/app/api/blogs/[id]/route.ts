@@ -8,7 +8,7 @@ import {
 import { isAdmin } from "@/lib/middleware/admin";
 import { updateBlogSchema } from "@/lib/validators/blog.validator";
 
-// Handles GET request for fetching a single blog by slug
+// GET request f
 export async function GET(
   req: NextRequest,
   context: { params: Promise<{ id: string }> },

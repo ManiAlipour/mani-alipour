@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-const PUBLIC_ROUTES = ["/", "/projects", "/about", "/contact"];
+const PUBLIC_ROUTES = ["/", "/projects", "/blogs", "/about", "/contact"];
 
 const AUTH_ROUTES = ["/auth/signin", "/auth/signup"];
 

@@ -7,7 +7,7 @@ export const GET = async () => {
   try {
     await connectDB();
 
-    const tags = await Tag.find({}).lean();
+    const tags = await Tag.find();
 
     return NextResponse.json({
       message: "تگ ها با موفقیت دریافت شد",
@@ -54,7 +54,7 @@ export const POST = async (req: NextRequest) => {
       slug: data.slug,
       ...(data.description && { description: data.description }),
     });
-    return NextResponse.json(
+   return NextResponse.json(
       {
         messsage: "تگ با موفقیت ثبت شد",
         data: tag,
@@ -65,6 +65,7 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json(
       {
         message: "خطا در ارتباط با سرور",
+
       },
       { status: 500 },
     );

@@ -70,7 +70,9 @@ export default function EditBlogForm({
       readAt: blog.readAt || 1, // مطابق تایپ TBlog
       isPublished: blog.isPublished ?? true,
       content: blog.content || "",
-      tags: blog.tags || [], // آرایه‌ای از IDها
+      tags: (blog.tags || []).map((t) =>
+        typeof t === "string" ? t : (t as { _id: string })._id,
+      ),
     },
     validationSchema,
     enableReinitialize: true,
@@ -217,12 +219,13 @@ export default function EditBlogForm({
           <label className="text-sm font-bold text-neon-blue flex items-center gap-2">
             <HiDocumentText /> محتوای متنی
           </label>
-          <div className="rounded-3xl overflow-hidden border border-white/10 bg-slate-900/50">
-            <Editor
-              value={formik.values.content}
-              onChange={(val) => formik.setFieldValue("content", val)}
-            />
-          </div>
+          <Editor
+            value={formik.values.content}
+            onChange={(val) => {
+              formik.setFieldValue("content", val);
+              formik.setFieldTouched("content", true, false);
+            }}
+          />
         </div>
 
         {/* Footer Actions */}

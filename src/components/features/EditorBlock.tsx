@@ -1,7 +1,10 @@
-"use client"
+"use client";
 
-import { useRef, useMemo } from "react";
-import JEditor from "jodit-react";
+import { useCallback, useEffect, useState } from "react";
+import { EditorContent, useEditor } from "@tiptap/react";
+import ProgBlogToolbar from "./editor/ProgBlogToolbar";
+import { getProgBlogExtensions } from "./editor/prog-blog-extensions";
+import "./editor/prog-blog-editor.css";
 
 type EditorBlockProps = {
   value: string;
@@ -11,74 +14,103 @@ type EditorBlockProps = {
   className?: string;
 };
 
-const EditorBlock = ({
+export default function EditorBlock({
   value,
   onChange,
   placeholder,
   readOnly = false,
   className = "",
-}: EditorBlockProps) => {
-  const editor = useRef(null);
+}: EditorBlockProps) {
+  const [sourceMode, setSourceMode] = useState(false);
+  const [sourceHtml, setSourceHtml] = useState(value);
 
-
-  const config = useMemo(
-    () => ({
-      readonly: readOnly,
-      placeholder: placeholder || "چیزی بنویسید...",
-      theme: "dark",
-      height: 320,
-      style: { background: "#0a0f1d", color: "#e5e7eb" },
-      uploader: {
-        insertImageAsBase64URI: true, // Enable base64 image insert
+  const editor = useEditor({
+    extensions: getProgBlogExtensions(placeholder),
+    content: value || "",
+    editable: !readOnly,
+    immediatelyRender: false,
+    onUpdate: ({ editor: ed }) => {
+      const html = ed.getHTML();
+      onChange(html);
+      setSourceHtml(html);
+    },
+    editorProps: {
+      attributes: {
+        class: "prog-blog-editor-content",
+        dir: "rtl",
       },
-      buttons: [
-        "bold",
-        "italic",
-        "underline",
-        "strikethrough",
-        "eraser",
-        "ul",
-        "ol",
-        "outdent",
-        "indent",
-        "font",
-        "fontsize",
-        "paragraph",
-        "image", // Add image button
-        "link",
-        "table",
-        "align",
-        "undo",
-        "redo",
-        "hr",
-        "fullsize",
-      ],
-      buttonsXS: [
-        "bold",
-        "italic",
-        "ul",
-        "ol",
-        "image",
-        "link",
-        "undo",
-        "redo",
-        "fullsize",
-      ],
-    }),
-    [readOnly, placeholder]
-  );
+    },
+  });
+
+  useEffect(() => {
+    if (!editor) return;
+    editor.setEditable(!readOnly);
+  }, [editor, readOnly]);
+
+  useEffect(() => {
+    if (!editor || sourceMode) return;
+    const current = editor.getHTML();
+    if (value !== current) {
+      editor.commands.setContent(value || "", { emitUpdate: false });
+      setSourceHtml(value || "");
+    }
+  }, [value, editor, sourceMode]);
+
+  const toggleSource = useCallback(() => {
+    if (!editor) return;
+    if (!sourceMode) {
+      setSourceHtml(editor.getHTML());
+      setSourceMode(true);
+    } else {
+      editor.commands.setContent(sourceHtml || "", { emitUpdate: false });
+      onChange(sourceHtml);
+      setSourceMode(false);
+    }
+  }, [editor, sourceMode, sourceHtml, onChange]);
+
+  const handleSourceBlur = () => {
+    onChange(sourceHtml);
+    if (editor) {
+      editor.commands.setContent(sourceHtml || "", { emitUpdate: false });
+    }
+  };
+
+  const wordCount = editor
+    ? editor.storage.characterCount?.words?.() ??
+      editor.getText().trim().split(/\s+/).filter(Boolean).length
+    : 0;
 
   return (
-    <div className={className}>
-      <JEditor
-        ref={editor}
-        value={value}
-        config={config}
-        onBlur={onChange}
-        tabIndex={1}
-      />
+    <div className={`prog-blog-editor ${className}`}>
+      {!readOnly && (
+        <ProgBlogToolbar
+          editor={editor}
+          sourceMode={sourceMode}
+          onToggleSource={toggleSource}
+        />
+      )}
+
+      <div className="prog-blog-editor-body">
+        {sourceMode ? (
+          <textarea
+            className="prog-blog-source"
+            value={sourceHtml}
+            onChange={(e) => setSourceHtml(e.target.value)}
+            onBlur={handleSourceBlur}
+            spellCheck={false}
+            aria-label="ویرایش HTML"
+          />
+        ) : (
+          <EditorContent editor={editor} />
+        )}
+      </div>
+
+      <div className="prog-blog-editor-footer">
+        <span>ادیتور وبلاگ فنی · TipTap + Syntax Highlight</span>
+        {!sourceMode && editor && (
+          <span>{wordCount} کلمه</span>
+        )}
+      </div>
     </div>
   );
-};
-
-export default EditorBlock;
+}

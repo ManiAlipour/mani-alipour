@@ -201,15 +201,25 @@ export default function AddBlogForm({ refetch }: { refetch: any }) {
 
           {/* Editor */}
           <div className="space-y-3 md:col-span-2">
-            <label className="flex items-center gap-2 px-1 text-sm font-bold text-gray-400">
-              <HiDocumentText /> محتوای مقاله
-            </label>
-            <div className="rounded-2xl border border-white/10 bg-black/20 min-h-[300px]">
-              <Editor
-                value={formik.values.content}
-                onChange={(val) => formik.setFieldValue("content", val)}
-              />
+            <div className="px-1">
+              <label className="flex items-center gap-2 text-sm font-bold text-gray-400">
+                <HiDocumentText /> محتوای مقاله
+              </label>
+              <p className="text-[11px] text-zinc-500 mt-1 mr-6">
+                ادیتور فنی: بلوک کد با هایلایت، جدول، لینک، تصویر، نقل‌قول و
+                حالت HTML
+              </p>
             </div>
+            <Editor
+              value={formik.values.content}
+              onChange={(val) => {
+                formik.setFieldValue("content", val);
+                formik.setFieldTouched("content", true, false);
+              }}
+            />
+            {formik.touched.content && formik.errors.content && (
+              <p className="text-red-400 text-xs mr-2">{formik.errors.content}</p>
+            )}
           </div>
         </div>
 
