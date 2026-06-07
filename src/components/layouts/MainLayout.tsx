@@ -5,6 +5,8 @@ import Footer from "../sections/Footer";
 import Header from "../sections/Header";
 import { Toaster } from "react-hot-toast";
 
+import { useEffect } from "react";
+
 const HIDE_LAYOUT_PATHS = ["/auth", "/dashboard", "/admin"];
 
 function shouldHideLayout(pathname: string) {

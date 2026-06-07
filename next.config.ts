@@ -24,6 +24,18 @@ const nextConfig: NextConfig = {
         port: "3000",
         pathname: "/storage/**",
       },
+      {
+        protocol: "https",
+        hostname: "liara.ir",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "console.liara.ir",
+        port: "",
+        pathname: "/**",
+      },
     ],
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],

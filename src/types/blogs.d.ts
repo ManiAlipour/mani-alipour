@@ -8,7 +8,10 @@ declare type TBlog = {
   readAt: number;
   cover: string;
   isPublished: boolean;
-  tags: string[];
+  tags: {
+    name: string;
+    _id: string;
+  }[];
   createdAt: string;
   updatedAt: string;
   __v: number;

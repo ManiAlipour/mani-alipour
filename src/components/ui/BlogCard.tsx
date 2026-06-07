@@ -1,72 +1,72 @@
+import Link from "next/link";
+import Image from "next/image";
+
 interface BlogCardProps {
-  blog: any;
+  blog: {
+    slug: string;
+    title: string;
+    excerpt?: string;
+    cover?: string;
+    createdAt?: string;
+    author?: { name?: string };
+    readAt?: number;
+  };
+}
+
+function formatDate(date?: string) {
+  if (!date) return "";
+  return new Date(date).toLocaleDateString("fa-IR", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 export default function BlogCard({ blog }: BlogCardProps) {
   return (
-    <div
-      key={blog.slug}
-      className="group flex flex-col rounded-[1.5rem] border border-cyan-900/50 shadow-xl overflow-hidden bg-gradient-to-br from-[#18243c]/90 to-[#222f47]/90 hover:scale-[1.025] hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl cursor-pointer"
+    <Link
+      href={`/blogs/${blog.slug}`}
+      className="group relative flex flex-col overflow-hidden rounded-3xl border border-cyan-500/15 bg-gradient-to-br from-[#121c2e]/95 via-[#172338]/95 to-[#1a2740]/95 shadow-xl transition-all duration-500 hover:-translate-y-1.5 hover:border-cyan-400/35 hover:shadow-2xl hover:shadow-cyan-900/30"
     >
-      <div className="relative overflow-hidden aspect-video w-full bg-cyan-950/40">
-        {blog.coverImage ? (
-          <img
-            src={blog.coverImage}
+      <div className="relative overflow-hidden bg-cyan-950/40 aspect-[16/10]">
+        {blog.cover ? (
+          <Image
+            src={blog.cover}
             alt={blog.title}
-            loading="lazy"
-            className="object-cover w-full h-full scale-105 group-hover:scale-110 transition-transform duration-500"
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl text-cyan-200/80 bg-cyan-950/30">
+          <div className="flex h-full min-h-[180px] items-center justify-center bg-gradient-to-br from-cyan-950/60 to-indigo-950/60 text-6xl">
             📚
           </div>
         )}
-        <div className="absolute inset-0 w-full h-full bg-gradient-to-t from-[#22365b]/60 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/80 via-[#0f172a]/10 to-transparent" />
       </div>
-      <div className="flex-1 flex flex-col justify-between px-6 py-5 gap-2">
-        <div>
-          <h3 className="text-cyan-200 text-2xl font-black mb-1 group-hover:text-cyan-300 transition">
-            {blog.title}
-          </h3>
-          {blog.shortDescription && (
-            <p className="text-cyan-300/90 text-base mb-1">
-              {blog.shortDescription}
-            </p>
-          )}
-          <p className="text-cyan-100/90 text-xs md:text-sm mb-2 leading-6 line-clamp-3">
-            {blog.description}
-          </p>
-        </div>
-        <div className="flex items-center justify-between mt-3">
-          <span className="text-xs text-cyan-400 font-medium">
-            {blog.publishedAt
-              ? new Date(blog.publishedAt).toLocaleDateString("fa-IR", {
-                  year: "2-digit",
-                  month: "short",
-                  day: "numeric",
-                })
-              : ""}
+      <div className="flex flex-1 flex-col gap-4 p-6">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-cyan-300/70">
+          <span className="inline-flex items-center gap-1 rounded-full border border-white/5 bg-white/5 px-2.5 py-1">
+            {blog.author?.name ?? "مانی علی‌پور"}
           </span>
-          {blog.url && (
-            <a
-              href={blog.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 bg-gradient-to-r from-cyan-400 to-indigo-500 px-3 py-1.5 rounded-xl text-white font-bold text-xs shadow hover:from-cyan-500 hover:to-indigo-400 hover:scale-105 transition-all duration-200"
-            >
-              مطالعه
-              <svg width="16" height="16" fill="none" className="inline ml-0.5">
-                <path
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  d="M4.5 11.5 11 5m0 0H6.4m4.6 0v4.5"
-                />
-              </svg>
-            </a>
-          )}
+          <span className="rounded-full border border-white/5 bg-white/5 px-2.5 py-1">
+            {formatDate(blog.createdAt)}
+          </span>
+          {blog.readAt ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/5 bg-white/5 px-2.5 py-1">
+              {blog.readAt} دقیقه مطالعه
+            </span>
+          ) : null}
         </div>
+        <h3 className="text-cyan-200 text-xl font-black mb-1 group-hover:text-cyan-300 transition-all">
+          {blog.title}
+        </h3>
+        {blog.excerpt && (
+          <p className="text-cyan-100/90 text-xs md:text-sm mb-2 leading-6 line-clamp-3">
+            {blog.excerpt}
+          </p>
+        )}
       </div>
-      <div className="absolute inset-0 pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-80 bg-gradient-to-br from-cyan-400/25 via-indigo-400/10 to-transparent z-10 rounded-[1.5rem]" />
-    </div>
+    </Link>
   );
 }

@@ -1,0 +1,199 @@
+/* Night Owl Theme Syntax Highlighting for All Languages */
+code[class*="language-"], pre[class*="language-"] {
+  color: #d6deeb;
+  background: #011627;
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  text-shadow: none;
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  line-height: 1.5;
+  tab-size: 4;
+  hyphens: none;
+}
+
+/* Comments */
+.token.comment,
+.token.prolog,
+.token.cdata {
+  color: #637777;
+  font-style: italic;
+}
+
+/* Keywords, language constructs */
+.token.keyword,
+.token.atrule {
+  color: #c792ea;
+  font-style: italic;
+}
+
+/* Strings, Attribute values */
+.token.string,
+.token.char,
+.token.attr-value,
+.token.regex {
+  color: #ecc48d;
+}
+
+/* Numbers, Constants */
+.token.number,
+.token.boolean,
+.token.constant,
+.token.symbol {
+  color: #f78c6c;
+}
+
+/* Property names */
+.token.property,
+.token.tag,
+.token.deleted {
+  color: #d6deeb;
+}
+
+/* Function names */
+.token.function,
+.token.class-name {
+  color: #82aaff;
+}
+
+/* Operators, punctuation */
+.token.operator,
+.token.punctuation {
+  color: #7fdbca;
+}
+
+/* Variables, selectors, important, bold */
+.token.variable,
+.token.selector,
+.token.important,
+.token.bold {
+  color: #addb67;
+  font-weight: bold;
+}
+
+/* Italic fonts */
+.token.italic {
+  font-style: italic;
+}
+
+/* Builtins and insertions */
+.token.builtin,
+.token.inserted {
+  color: #addb67;
+  background: #002b3620;
+}
+
+/* Marked text (for highlighting lines, etc.) */
+pre[data-line] {
+  position: relative;
+}
+pre[class*="language-"] > code[data-highlighted-line] {
+  background-color: #022b3a;
+  display: block;
+  margin-right: -1em;
+  margin-left: -1em;
+  padding-right: 1em;
+  padding-left: 0.75em;
+}
+
+/* Selection color in code blocks */
+code[class*="language-"] ::selection,
+pre[class*="language-"] ::selection {
+  background: #1b2b34;
+}
+
+/* Language labels */
+.language-javascript::before {
+  content: 'js';
+  color: #c792ea;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+.language-css::before {
+  content: 'css';
+  color: #82aaff;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+.language-html::before {
+  content: 'html';
+  color: #ffcb8b;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+.language-python::before {
+  content: 'py';
+  color: #addb67;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+.language-typescript::before {
+  content: 'ts';
+  color: #7fdbca;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+.language-json::before {
+  content: 'json';
+  color: #ecc48d;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+
+/* Responsive, scrollable code blocks */
+pre[class*="language-"] {
+  overflow: auto;
+  border-radius: 6px;
+  padding: 1em;
+}
+code[class*="language-"] {
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+/* High contrast for highlighted lines */
+pre[class*="language-"] > code .highlight-line {
+  display: block;
+  background-color: #2d4150;
+  margin-left: -1em;
+  margin-right: -1em;
+  padding-left: 1em;
+  border-left: 4px solid #7fdbca;
+}
+
+/* Colors for other popular languages */
+.language-php::before {
+  content: 'php';
+  color: #b0bec5;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+.language-cpp::before, .language-c::before {
+  content: 'cpp';
+  color: #f78c6c;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+.language-java::before {
+  content: 'java';
+  color: #f78c6c;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+.language-go::before {
+  content: 'go';
+  color: #82aaff;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+.language-ruby::before {
+  content: 'rb';
+  color: #ff6363;
+  font-size: 0.8em;
+  margin-right: 0.5em;
+}
+
+/* Add additional languages as needed */

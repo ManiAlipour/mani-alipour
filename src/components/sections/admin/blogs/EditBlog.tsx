@@ -70,9 +70,7 @@ export default function EditBlogForm({
       readAt: blog.readAt || 1, // مطابق تایپ TBlog
       isPublished: blog.isPublished ?? true,
       content: blog.content || "",
-      tags: (blog.tags || []).map((t) =>
-        typeof t === "string" ? t : (t as { _id: string })._id,
-      ),
+      tags: (blog.tags || []).map((t) => (typeof t === "string" ? t : t._id)),
     },
     validationSchema,
     enableReinitialize: true,
