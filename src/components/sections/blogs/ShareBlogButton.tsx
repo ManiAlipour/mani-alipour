@@ -1,5 +1,6 @@
 "use client";
 import { useCopyToClipboard } from "iso-hooks";
+import toast from "react-hot-toast";
 import { AiOutlineShareAlt } from "react-icons/ai";
 
 export default function ShareBlogButton({ slug }: { slug: string }) {
@@ -20,8 +21,7 @@ export default function ShareBlogButton({ slug }: { slug: string }) {
           typeof window !== "undefined" ? window.location.href : shareUrl,
         );
         if (typeof window !== "undefined") {
-          // Toast feedback (requires toast lib or alert fallback)
-          window?.alert("لینک کپی شد!");
+          toast.success("لینک کپی شد");
         }
       }}
       type="button"

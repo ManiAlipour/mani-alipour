@@ -41,10 +41,17 @@ export function getProgBlogExtensions(placeholder?: string) {
   return [
     StarterKit.configure({
       codeBlock: false,
-      heading: { levels: [1, 2, 3] },
+      heading: {
+        levels: [1, 2, 3],
+      },
+      hardBreak: {
+        keepMarks: true,
+      },
     }),
+
     Underline,
     Highlight.configure({ multicolor: false }),
+
     Link.configure({
       openOnClick: false,
       HTMLAttributes: {
@@ -52,16 +59,24 @@ export function getProgBlogExtensions(placeholder?: string) {
         rel: "noopener noreferrer",
       },
     }),
+
     Image.configure({
-      HTMLAttributes: { class: "prog-blog-image" },
+      HTMLAttributes: {
+        class: "prog-blog-image",
+      },
+      allowBase64: true,
     }),
+
     TextAlign.configure({
       types: ["heading", "paragraph"],
       defaultAlignment: "right",
     }),
+
     Placeholder.configure({
-      placeholder: placeholder ?? "محتوای مقاله را بنویسید — کد، جدول، تصویر و...",
+      placeholder:
+        placeholder ?? "محتوای مقاله را بنویسید — کد، جدول، تصویر و...",
     }),
+
     CodeBlockLowlight.configure({
       lowlight,
       defaultLanguage: "javascript",
@@ -69,9 +84,12 @@ export function getProgBlogExtensions(placeholder?: string) {
         class: "prog-code-block",
       },
     }),
+
     Table.configure({
       resizable: true,
-      HTMLAttributes: { class: "prog-blog-table" },
+      HTMLAttributes: {
+        class: "prog-blog-table",
+      },
     }),
     TableRow,
     TableHeader,

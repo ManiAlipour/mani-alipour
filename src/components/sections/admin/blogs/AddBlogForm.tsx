@@ -1,14 +1,10 @@
 "use client";
+import { useState } from "react";
 import { useFormik } from "formik";
 import { useFetch } from "iso-hooks";
 import * as yup from "yup";
 import Editor from "@/components/features/EditorBlock";
-import {
-  FaCheckCircle,
-  FaTimesCircle,
-  FaRegClock,
-  FaRocket,
-} from "react-icons/fa";
+import { FaRegClock, FaRocket, FaSpinner } from "react-icons/fa";
 import { MdPublishedWithChanges } from "react-icons/md";
 import { PiTagFill } from "react-icons/pi";
 import { FiEdit2, FiLink, FiFileText } from "react-icons/fi";
@@ -28,7 +24,7 @@ const validationSchema = yup.object({
     .string()
     .min(10, "خلاصه خیلی کوتاهه")
     .required("خلاصه الزامی است"),
-  cover: yup.string().url("آدرس عکس معتبر نیست").required("کاور مقاله کو؟"),
+  cover: yup.string().required("کاور مقاله کو؟"),
   readTime: yup.number().min(1, "حداقل ۱ دقیقه").required("زمان مطالعه؟"),
   content: yup
     .string()
@@ -38,6 +34,7 @@ const validationSchema = yup.object({
 });
 
 export default function AddBlogForm({ refetch }: { refetch: any }) {
+  const [isUploading, setIsUploading] = useState(false);
   const tagsResponse = useFetch<{ data: TTag[] }>("/api/tags");
 
   const formik = useFormik({
@@ -60,15 +57,50 @@ export default function AddBlogForm({ refetch }: { refetch: any }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
         });
-        if (!res.ok) throw new Error();
+
+        if (!res.ok) {
+          console.log(res);
+          throw new Error();
+        }
+
         toast.success("ثبت شد!", { id: loadToast });
         resetForm();
         await refetch();
-      } catch (error) {
+      } catch (err) {
+        console.error(err);
+
         toast.error("خطایی رخ داد", { id: loadToast });
       }
     },
   });
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const toastId = toast.loading("در حال آپلود تصویر...");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      formik.setFieldValue("cover", data.url);
+
+      toast.success("آپلود شد ✅", { id: toastId });
+    } catch {
+      toast.error("آپلود ناموفق بود", { id: toastId });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   if (tagsResponse.loading)
     return <div className="p-20 text-center text-neon-blue">...</div>;
@@ -99,12 +131,11 @@ export default function AddBlogForm({ refetch }: { refetch: any }) {
               ثبت مقاله جدید
             </h2>
             <p className="mt-1 text-xs text-gray-500">
-             اطلاعات رو با دقت وارد کنید
+              اطلاعات رو با دقت وارد کنید
             </p>
           </div>
         </div>
 
-        {/* Form Body */}
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-8">
           <div className="md:col-span-2">
             <FancyInputBox
@@ -143,26 +174,33 @@ export default function AddBlogForm({ refetch }: { refetch: any }) {
             />
           </div>
 
-          {/* Cover Section */}
+          {/* Cover Upload */}
           <div className="space-y-4 md:col-span-2">
-            <FancyInputBox
-              icon={<BsImage />}
-              label="آدرس کاور"
-              {...formik.getFieldProps("cover")}
-              error={formik.touched.cover && formik.errors.cover}
+            <label className="flex items-center gap-2 text-sm font-bold text-gray-400">
+              <BsImage className="text-neon-blue" /> آپلود کاور
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleUpload}
+              className="w-full p-3 text-sm border rounded-xl bg-white/5 border-white/10"
             />
+
+            {isUploading && (
+              <div className="flex items-center gap-2 text-sm text-neon-blue">
+                <FaSpinner className="animate-spin" />
+                درحال آپلود...
+              </div>
+            )}
+
             {formik.values.cover && (
-              <div className="relative overflow-hidden border aspect-video rounded-2xl border-white/10 group">
+              <div className="relative overflow-hidden border aspect-video rounded-2xl border-white/10">
                 <img
                   src={formik.values.cover}
                   className="object-cover w-full h-full"
                   alt="Preview"
                 />
-                <div className="absolute inset-0 flex items-center justify-center transition-opacity opacity-0 bg-black/40 group-hover:opacity-100">
-                  <span className="text-xs font-bold text-white">
-                    پیش‌نمایش کاور
-                  </span>
-                </div>
               </div>
             )}
           </div>
@@ -172,9 +210,11 @@ export default function AddBlogForm({ refetch }: { refetch: any }) {
             <label className="flex items-center gap-2 text-sm font-bold text-gray-400">
               <PiTagFill className="text-neon-green" /> انتخاب برچسب‌ها
             </label>
-            <div className="flex flex-wrap gap-2 p-1 overflow-y-auto max-h-40 custom-scrollbar">
+
+            <div className="flex flex-wrap gap-2 p-1 overflow-y-auto max-h-40">
               {tags.map((tag) => {
                 const isSelected = formik.values.tags.includes(tag._id);
+
                 return (
                   <button
                     key={tag._id}
@@ -183,13 +223,14 @@ export default function AddBlogForm({ refetch }: { refetch: any }) {
                       const next = isSelected
                         ? formik.values.tags.filter((t) => t !== tag._id)
                         : [...formik.values.tags, tag._id];
+
                       formik.setFieldValue("tags", next);
                     }}
                     className={twMerge(
                       "px-4 py-2 rounded-xl text-xs font-bold transition-all border",
                       isSelected
-                        ? "bg-neon-blue text-black border-neon-blue shadow-[0_0_15px_rgba(34,211,238,0.3)]"
-                        : "bg-white/5 border-white/10 text-gray-400 hover:border-white/30",
+                        ? "bg-neon-blue text-black border-neon-blue"
+                        : "bg-white/5 border-white/10 text-gray-400",
                     )}
                   >
                     {tag.name}
@@ -205,11 +246,8 @@ export default function AddBlogForm({ refetch }: { refetch: any }) {
               <label className="flex items-center gap-2 text-sm font-bold text-gray-400">
                 <HiDocumentText /> محتوای مقاله
               </label>
-              <p className="text-[11px] text-zinc-500 mt-1 mr-6">
-                ادیتور فنی: بلوک کد با هایلایت، جدول، لینک، تصویر، نقل‌قول و
-                حالت HTML
-              </p>
             </div>
+
             <Editor
               value={formik.values.content}
               onChange={(val) => {
@@ -217,50 +255,32 @@ export default function AddBlogForm({ refetch }: { refetch: any }) {
                 formik.setFieldTouched("content", true, false);
               }}
             />
+
             {formik.touched.content && formik.errors.content && (
-              <p className="text-red-400 text-xs mr-2">{formik.errors.content}</p>
+              <p className="text-red-400 text-xs mr-2">
+                {formik.errors.content}
+              </p>
             )}
           </div>
         </div>
 
-        <div className="sticky bottom-0 md:static bg-[#0f172a] md:bg-transparent pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 pb-2 md:pb-0">
-          <label className="flex items-center gap-3 cursor-pointer select-none group">
-            <div
-              onClick={() =>
+        {/* Footer */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-white/5">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formik.values.isPublished}
+              onChange={() =>
                 formik.setFieldValue("isPublished", !formik.values.isPublished)
               }
-              className={twMerge(
-                "w-14 h-7 rounded-full p-1 transition-all duration-300 relative border",
-                formik.values.isPublished
-                  ? "bg-neon-green/20 border-neon-green/30 shadow-[0_0_10px_rgba(74,222,128,0.1)]"
-                  : "bg-zinc-800 border-white/5",
-              )}
-            >
-              <div
-                className={twMerge(
-                  "w-5 h-5 rounded-full transition-all duration-300 shadow-sm",
-                  formik.values.isPublished
-                    ? "-translate-x-7 bg-neon-green shadow-[0_0_8px_#4ade80]" // مقدار منفی برای حرکت به چپ در حالت RTL
-                    : "translate-x-0 bg-zinc-500",
-                )}
-              />
-            </div>
-            <span
-              className={twMerge(
-                "text-sm font-bold transition-colors",
-                formik.values.isPublished
-                  ? "text-neon-green"
-                  : "text-gray-500 group-hover:text-gray-400",
-              )}
-            >
-              انتشار همگانی
-            </span>
+            />
+            انتشار همگانی
           </label>
 
           <button
             type="submit"
-            disabled={formik.isSubmitting}
-            className="flex items-center justify-center w-full gap-3 px-10 py-4 font-black text-black transition-transform shadow-lg md:w-auto bg-gradient-to-r from-neon-green to-neon-blue rounded-2xl shadow-neon-blue/20 active:scale-95"
+            disabled={formik.isSubmitting || isUploading}
+            className="flex items-center justify-center w-full gap-3 px-10 py-4 font-black text-black md:w-auto bg-gradient-to-r from-neon-green to-neon-blue rounded-2xl"
           >
             {formik.isSubmitting ? "صبور باش..." : "پرتاب مقاله"}
             <FaRocket />

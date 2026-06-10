@@ -17,7 +17,12 @@ export async function generateMetadata({ params }: IBlogPage) {
   const { slug } = await params;
   const blog = await getBlog(slug);
 
-  if (!blog) return { title: "مقاله یافت نشد" };
+  if (!blog) {
+    return {
+      title: "مقاله یافت نشد",
+      description: "مقاله موردنظر پیدا نشد.",
+    };
+  }
 
   return {
     title: blog.title,
@@ -43,189 +48,178 @@ export default async function BlogPage({ params }: IBlogPage) {
     <>
       <ReadingProgress />
 
-      <main className="min-h-screen bg-gradient-to-br from-[#0d1117] via-[#111b2a] to-[#172236] pb-32 selection:bg-cyan-600/30">
+      <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.10),transparent_32rem),linear-gradient(135deg,#0d1117,#111b2a_45%,#172236)] pb-20 selection:bg-cyan-500/30 md:pb-28">
         {/* Sticky Top Bar */}
-        <nav className="sticky top-0 z-40 border-b border-cyan-800/40 bg-[#0b1622]/70 py-3 px-0 backdrop-blur-[4px] shadow-sm">
-          <div className="mx-auto flex max-w-4xl items-center justify-between px-4">
+        <nav className="sticky top-0 z-40 border-b border-cyan-800/35 bg-[#07111d]/75 px-0 py-2.5 shadow-sm backdrop-blur-md md:py-3">
+          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 sm:px-5 lg:px-6">
             <Link
               href="/blogs"
-              className="group flex items-center gap-2 text-cyan-400 hover:text-white font-bold text-base transition-all duration-200"
+              className="group inline-flex min-h-10 items-center gap-2 rounded-xl border border-cyan-700/25 bg-cyan-950/20 px-3 py-2 text-sm font-bold text-cyan-300 transition-all duration-200 hover:border-cyan-400/40 hover:bg-cyan-900/30 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/50 sm:text-base"
               aria-label="بازگشت به وبلاگ"
             >
-              <FaArrowRight className="transition-transform group-hover:-translate-x-1 text-lg" />
-              بازگشت به وبلاگ
+              <FaArrowRight className="text-base transition-transform group-hover:-translate-x-1 sm:text-lg" />
+              <span className="hidden xs:inline">بازگشت به وبلاگ</span>
+              <span className="xs:hidden">بازگشت</span>
             </Link>
+
             <ShareBlogButton slug={slug} />
           </div>
         </nav>
-        <article className="mx-auto max-w-4xl mt-10 md:mt-14 px-4 md:px-8 pb-4 w-full">
-          {/* Blog Cover */}
-          {blog.cover && (
-            <div className="relative overflow-hidden rounded-3xl border border-cyan-800/20 shadow-lg aspect-[21/9] mb-10 flex items-center justify-center bg-cyan-950/20">
-              <Image
-                src={blog.cover}
-                alt={blog.title}
-                fill
-                priority
-                className="object-cover object-center transition-transform duration-700 scale-100 hover:scale-105"
-                sizes="(max-width: 896px) 100vw, 896px"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#121c2c]/85 via-transparent to-transparent pointer-events-none" />
-            </div>
-          )}
 
-          {/* Blog Title */}
-          <header className="mb-12 flex flex-col gap-4 w-full" dir="rtl">
-            <h1 className="w-full text-right text-4xl md:text-5xl font-black text-transparent bg-linear-to-br from-neon-green to-neon-blue bg-clip-text break-words leading-tight">
-              {blog.title}
-            </h1>
+        <article className="mx-auto mt-7 w-full max-w-5xl px-4 pb-4 sm:px-5 md:mt-10 lg:px-6">
+          {/* Inner readable column */}
+          <div className="mx-auto w-full max-w-4xl">
+            {/* Blog Cover */}
+            {blog.cover && (
+              <div className="relative mb-8 aspect-[16/9] overflow-hidden rounded-2xl border border-cyan-700/25 bg-cyan-950/20 shadow-[0_18px_60px_rgba(0,0,0,0.35)] sm:rounded-3xl md:mb-10 md:aspect-[21/9]">
+                <Image
+                  unoptimized
+                  src={blog.cover}
+                  alt={blog.title}
+                  fill
+                  priority
+                  className="object-cover object-center transition-transform duration-700 hover:scale-105"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 896px"
+                />
 
-            <div className="flex flex-wrap gap-x-6 gap-y-3 items-center justify-start text-cyan-200/90 font-medium text-sm">
-              <span className="inline-flex items-center gap-2 rounded-lg border border-cyan-700/40 px-3 py-1.5 bg-cyan-900/40">
-                <FaUser className="text-cyan-500 text-lg" />
-                <span dir="ltr">{blog.author?.name ?? "مانی علی‌پور"}</span>
-              </span>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#08111f]/90 via-[#08111f]/15 to-transparent" />
+              </div>
+            )}
 
-              <span className="inline-flex items-center gap-2 rounded-lg border border-cyan-700/40 px-3 py-1.5 bg-cyan-900/40">
-                <MdOutlineDateRange className="text-emerald-400 text-lg" />
+            {/* Blog Title */}
+            <header
+              className="mb-8 flex w-full flex-col gap-4 md:mb-10"
+              dir="rtl"
+            >
+              <h1 className="w-full break-words text-right text-3xl font-black leading-[1.55] text-transparent bg-linear-to-br from-neon-green to-neon-blue bg-clip-text sm:text-4xl sm:leading-[1.45] md:text-5xl md:leading-[1.35]">
+                {blog.title}
+              </h1>
+
+              <div className="flex flex-wrap items-center justify-start gap-2.5 text-sm font-medium text-cyan-100/90 sm:gap-3">
+                <span className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-cyan-700/35 bg-cyan-950/35 px-3 py-1.5">
+                  <FaUser className="text-base text-cyan-400" />
+                  <span dir="ltr">{blog.author?.name ?? "مانی علی‌پور"}</span>
+                </span>
+
+                <span className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-cyan-700/35 bg-cyan-950/35 px-3 py-1.5">
+                  <MdOutlineDateRange className="text-lg text-emerald-400" />
+                  <span>
+                    {new Date(blog.createdAt as string).toLocaleDateString(
+                      "fa-IR",
+                      {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      },
+                    )}
+                  </span>
+                </span>
+
+                {blog.readAt && (
+                  <span className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-amber-500/35 bg-amber-950/20 px-3 py-1.5 text-amber-300">
+                    <FaRegClock className="text-base text-amber-400" />
+                    <span>{blog.readAt} دقیقه مطالعه</span>
+                  </span>
+                )}
+              </div>
+            </header>
+
+            {/* Blog Excerpt */}
+            {blog.excerpt && (
+              <blockquote className="relative mb-8 rounded-2xl border-r-4 border-neon-green/80 bg-gradient-to-l from-cyan-700/12 to-transparent px-5 py-5 text-base leading-9 text-slate-100 shadow-[0_14px_45px_rgba(0,0,0,0.22)] not-italic sm:px-7 sm:py-6 sm:text-lg md:mb-10 md:text-xl">
+                <span className="pointer-events-none absolute -top-5 right-4 select-none text-6xl text-neon-green/10 sm:text-7xl">
+                  “
+                </span>
+                <p className="relative m-0 text-justify">{blog.excerpt}</p>
+              </blockquote>
+            )}
+
+            {/* Blog Tags */}
+            {blog.tags && Array.isArray(blog.tags) && blog.tags.length > 0 && (
+              <div className="mb-8 flex flex-wrap items-center gap-2 md:mb-10">
+                <span className="ml-1 inline-flex items-center gap-1 text-sm font-bold text-cyan-300">
+                  <FaHashtag className="text-lg text-neon-green" />
+                  برچسب‌ها:
+                </span>
+
+                {blog.tags.map((t: any) => (
+                  <Link
+                    key={t._id}
+                    href={`/blogs?tag=${t.slug}`}
+                    className="rounded-xl border border-cyan-700/25 bg-cyan-900/25 px-3 py-1.5 text-xs font-semibold text-cyan-100/90 transition hover:border-neon-cyan/40 hover:bg-neon-cyan/15 hover:text-neon-cyan focus:outline-none focus:ring-2 focus:ring-cyan-400/40"
+                  >
+                    {t.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Blog Content */}
+            <section
+              className="
+                blog-content
+                max-w-none
+                text-justify
+                text-slate-100
+              "
+              dir="rtl"
+              dangerouslySetInnerHTML={{ __html: blog.content }}
+            />
+
+            {/* Footer */}
+            <footer className="relative mt-14 border-t border-cyan-800/30 pt-7 md:mt-16 md:pt-8">
+              <div className="mb-10 flex flex-col justify-between gap-4 text-xs text-cyan-300/65 md:mb-12 md:flex-row md:items-center">
+                <p className="flex flex-wrap items-center gap-2">
+                  آخرین به‌روزرسانی:
+                  <span className="text-cyan-100/90">
+                    {new Date(blog.updatedAt as string).toLocaleDateString(
+                      "fa-IR",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )}
+                  </span>
+                </p>
+
                 <span>
-                  {new Date(blog.createdAt as string).toLocaleDateString(
-                    "fa-IR",
-                    {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    },
-                  )}
+                  &copy; {new Date().getFullYear()}{" "}
+                  <Link
+                    href="/"
+                    className="font-semibold text-neon-cyan hover:underline"
+                    title="من ialipour.ir"
+                  >
+                    manialipour.ir
+                  </Link>{" "}
+                  — تمامی حقوق محفوظ است.
                 </span>
-              </span>
+              </div>
 
-              {blog.readAt && (
-                <span className="inline-flex items-center gap-2 rounded-lg border border-amber-500/40 px-3 py-1.5 bg-yellow-900/10 text-amber-300">
-                  <FaRegClock className="text-amber-400 text-lg" />
-                  {blog.readAt} دقیقه مطالعه
-                </span>
-              )}
-            </div>
-          </header>
+              <div className="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-slate-900/95 via-amber-950/25 to-orange-950/30 p-6 text-center shadow-[0_18px_55px_rgba(0,0,0,0.28)] sm:p-8 md:p-10">
+                <h3 className="mb-3 text-xl font-black text-amber-300 drop-shadow sm:text-2xl">
+                  این مطلب برات مفید بود؟
+                </h3>
 
-          {/* Blog Excerpt */}
-          {blog.excerpt && (
-            <blockquote className="relative mb-10 md:mb-14 px-7 py-6 border-r-4 border-neon-green/80 bg-gradient-to-l from-cyan-800/10 to-transparent text-xl leading-relaxed text-white/90 shadow-lg rounded-xl text-justify not-italic">
-              <span className="absolute -top-6 right-4 text-7xl text-neon-green/10 select-none pointer-events-none">
-                “
-              </span>
-              {blog.excerpt}
-            </blockquote>
-          )}
+                <p className="mx-auto mb-6 max-w-2xl text-sm leading-8 text-slate-300 sm:text-base">
+                  با حمایتت بهم انرژی می‌دی که تولید محتوای تخصصی‌تر، رایگان و
+                  باکیفیت‌تر رو ادامه بدم.
+                </p>
 
-          {/* Blog Tags */}
-          {blog.tags && Array.isArray(blog.tags) && blog.tags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 mb-8 md:mb-12">
-              <span className="flex items-center gap-1 text-cyan-300 text-sm font-bold ml-2">
-                <FaHashtag className="text-neon-green text-lg" />
-                برچسب‌ها:
-              </span>
-              {blog.tags.map((t: any) => (
-                <Link
-                  key={t._id}
-                  href={`/blogs?tag=${t.slug}`}
-                  className="rounded-xl border border-cyan-800/20 bg-cyan-800/20 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-neon-cyan/20 hover:text-neon-cyan transition"
+                <a
+                  href="https://coffeebede.ir/manialipour"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-amber-400 px-6 py-3 text-sm font-black text-[#181818] shadow-xl shadow-amber-400/15 transition-all hover:scale-[1.03] hover:bg-amber-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-amber-300 sm:px-7 sm:text-base"
                 >
-                  {t.name}
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {/* Blog Content */}
-          <section
-            className="
-              blog-content-custom
-              prose prose-invert prose-lg
-              max-w-none
-              text-justify
-              leading-9
-              text-slate-100
-              prose-blockquote:font-serif
-              prose-blockquote:text-lg
-              prose-blockquote:text-neon-green/90
-              prose-blockquote:not-italic
-              prose-h2:text-xl
-              prose-h2:font-black
-              prose-a:text-neon-blue
-              prose-a:underline
-              prose-a:font-mono
-              hover:prose-a:text-neon-cyan
-              prose-code:rounded
-              prose-code:bg-slate-800/70
-              prose-code:text-neon-orange
-              prose-code:px-2
-              prose-code:font-mono 
-              prose-code:text-sm
-              prose-img:rounded-2xl
-              prose-img:shadow-xl
-              prose-pre:rounded-lg
-              prose-pre:bg-[#101926]
-              prose-pre:border
-              prose-pre:border-neon-cyan/20
-              prose-li:marker:text-neon-cyan
-              not-italic
-            "
-            dir="rtl"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
-          />
-
-          {/* Footer */}
-          <footer className="mt-20 border-t border-cyan-800/30 pt-8 relative">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-              <p className="text-xs text-cyan-300/60 flex items-center gap-2">
-                آخرین به‌روزرسانی:
-                <span className="text-cyan-200">
-                  {new Date(blog.updatedAt as string).toLocaleDateString(
-                    "fa-IR",
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    },
-                  )}
-                </span>
-              </p>
-              <span className="text-cyan-300/60 text-xs">
-                &copy; {new Date().getFullYear()}{" "}
-                <Link
-                  href="/"
-                  className="text-neon-cyan font-semibold hover:underline"
-                  title="من ialipour.ir"
-                >
-                  manialipour.ir
-                </Link>{" "}
-                — تمامی حقوق محفوظ است.
-              </span>
-            </div>
-
-            <div className="mt-12 rounded-3xl border border-amber-400/20 bg-gradient-to-br from-amber-500/10 to-orange-500/20 p-10 text-center shadow-xl flex flex-col items-center gap-2">
-              <h3 className="mb-2 text-2xl font-bold text-neon-orange drop-shadow">
-                این مطلب برات مفید بود؟
-              </h3>
-              <p className="mb-6 text-slate-300 text-base leading-relaxed not-italic">
-                با حمایتت بهم انرژی می‌دی که تولید محتوای تخصصی‌تر، رایگان و
-                باکیفیت‌تر رو ادامه بدم.
-              </p>
-              <a
-                href="https://coffeebede.ir/manialipour"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 rounded-lg bg-amber-400 text-[#1a1a1a] font-bold text-base px-7 py-3 shadow-xl shadow-amber-400/20 transition-all hover:bg-amber-500 hover:text-black hover:scale-105 focus:ring focus:ring-amber-400 focus:outline-none"
-              >
-                ☕️ یه قهوه مهمونم کن
-              </a>
-            </div>
-          </footer>
+                  ☕️ یه قهوه مهمونم کن
+                </a>
+              </div>
+            </footer>
+          </div>
 
           {/* Related Blogs */}
-          <aside className="mt-20">
+          <aside className="mx-auto mt-14 w-full max-w-5xl md:mt-16">
             <RelatedBlogs blogs={related} />
           </aside>
         </article>

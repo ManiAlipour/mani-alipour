@@ -12,7 +12,7 @@ export const createBlogSchema = z.object({
   content: z.string().min(50, "محتوا خیلی کوتاه است"),
   excerpt: z.string(),
 
-  cover: z.string().url().optional(),
+  cover: z.string().optional(),
 
   readTime: z.number().min(1).max(60).optional(),
 

@@ -31,6 +31,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
       <div className="relative overflow-hidden bg-cyan-950/40 aspect-[16/10]">
         {blog.cover ? (
           <Image
+            unoptimized
             src={blog.cover}
             alt={blog.title}
             fill

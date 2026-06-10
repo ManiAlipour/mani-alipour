@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react"; // اضافه شد
 import { useFormik } from "formik";
 import { useFetch } from "iso-hooks";
 import * as yup from "yup";
@@ -8,17 +9,17 @@ import {
   FaTimesCircle,
   FaRegClock,
   FaSave,
+  FaSpinner, // برای لودینگ
 } from "react-icons/fa";
 import { MdEditNote } from "react-icons/md";
 import { PiTagFill } from "react-icons/pi";
-import { FiEdit2, FiLink, FiFileText } from "react-icons/fi";
+import { FiEdit2, FiLink, FiFileText, FiUploadCloud } from "react-icons/fi"; // اضافه شد
 import { HiDocumentText } from "react-icons/hi";
 import { BsImage } from "react-icons/bs";
 import { twMerge } from "tailwind-merge";
 import toast from "react-hot-toast";
 import FancyInputBox from "./Input";
 
-// اعتبار سنجی هماهنگ با مدل داده‌ای تو
 const validationSchema = yup.object({
   title: yup.string().required("عنوان الزامی است"),
   slug: yup
@@ -32,10 +33,7 @@ const validationSchema = yup.object({
     .string()
     .min(10, "خلاصه باید حداقل ۱۰ کاراکتر باشد")
     .required("خلاصه الزامی است"),
-  cover: yup
-    .string()
-    .url("آدرس تصویر معتبر نیست")
-    .required("آدرس تصویر الزامی است"),
+  cover: yup.string().required("تصویر کاور الزامی است"), // همچنان رشته می‌ماند چون URL ذخیره می‌شود
   readAt: yup
     .number()
     .min(1, "زمان مطالعه حداقل ۱ باشد")
@@ -49,7 +47,7 @@ const validationSchema = yup.object({
 });
 
 interface EditBlogFormProps {
-  blog: TBlog;
+  blog: any; // یا TBlog
   onClose: () => void;
   refetch: () => Promise<void>;
 }
@@ -59,7 +57,8 @@ export default function EditBlogForm({
   onClose,
   refetch,
 }: EditBlogFormProps) {
-  const tagsResponse = useFetch<{ data: TTag[] }>("/api/tags");
+  const [isUploading, setIsUploading] = useState(false); // وضعیت آپلود
+  const tagsResponse = useFetch<{ data: any[] }>("/api/tags");
 
   const formik = useFormik({
     initialValues: {
@@ -67,10 +66,12 @@ export default function EditBlogForm({
       slug: blog.slug || "",
       excerpt: blog.excerpt || "",
       cover: blog.cover || "",
-      readAt: blog.readAt || 1, // مطابق تایپ TBlog
+      readAt: blog.readAt || 1,
       isPublished: blog.isPublished ?? true,
       content: blog.content || "",
-      tags: (blog.tags || []).map((t) => (typeof t === "string" ? t : t._id)),
+      tags: (blog.tags || []).map((t: any) =>
+        typeof t === "string" ? t : t._id,
+      ),
     },
     validationSchema,
     enableReinitialize: true,
@@ -78,7 +79,7 @@ export default function EditBlogForm({
       const loadingToast = toast.loading("در حال ثبت تغییرات...");
       try {
         const res = await fetch(`/api/blogs/${blog._id}`, {
-          method: "PATCH",
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
         });
@@ -97,6 +98,35 @@ export default function EditBlogForm({
     },
   });
 
+  // تابع آپلود فایل
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setIsUploading(true);
+    const uploadToast = toast.loading("در حال آپلود تصویر...");
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("آپلود ناموفق بود");
+
+      const data = await res.json();
+      formik.setFieldValue("cover", data.url);
+      toast.success("تصویر با موفقیت آپلود شد", { id: uploadToast });
+    } catch (error) {
+      toast.error("خطا در آپلود تصویر", { id: uploadToast });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const allTags = tagsResponse.data?.data ?? [];
 
   return (
@@ -109,7 +139,7 @@ export default function EditBlogForm({
             "linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%)",
         }}
       >
-        {/* Header */}
+        {/* Header - همان قبلی */}
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-neon-blue/20 rounded-2xl text-neon-blue">
@@ -147,7 +177,7 @@ export default function EditBlogForm({
           />
         </div>
 
-        {/* Read Time & Cover */}
+        {/* Read Time & Photo Upload Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <FancyInputBox
             icon={<FaRegClock />}
@@ -156,17 +186,53 @@ export default function EditBlogForm({
             error={formik.touched.readAt && formik.errors.readAt}
             {...formik.getFieldProps("readAt")}
           />
-          <div className="md:col-span-2">
-            <FancyInputBox
-              icon={<BsImage />}
-              label="آدرس تصویر کاور"
-              error={formik.touched.cover && formik.errors.cover}
-              {...formik.getFieldProps("cover")}
-            />
+
+          {/* بخش آپلود عکس اختصاصی */}
+          <div className="md:col-span-2 flex flex-col gap-2">
+            <label className="text-sm font-bold text-neon-blue flex items-center gap-2">
+              <BsImage /> تصویر کاور
+            </label>
+            <div className="relative group overflow-hidden bg-black/20 border-2 border-dashed border-white/10 hover:border-neon-blue/50 rounded-2xl transition-all h-[58px] flex items-center px-4">
+              {isUploading ? (
+                <div className="flex items-center gap-3 text-neon-blue animate-pulse">
+                  <FaSpinner className="animate-spin" />
+                  <span className="text-sm">در حال آپلود...</span>
+                </div>
+              ) : (
+                <label className="flex items-center gap-3 w-full cursor-pointer">
+                  <FiUploadCloud className="text-neon-green text-xl" />
+                  <span className="text-sm text-gray-400 truncate">
+                    {formik.values.cover
+                      ? "تغییر تصویر کاور"
+                      : "انتخاب فایل تصویر..."}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
+              {formik.values.cover && !isUploading && (
+                <div className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg overflow-hidden border border-white/20">
+                  <img
+                    src={formik.values.cover}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+            {formik.touched.cover && formik.errors.cover && (
+              <span className="text-[10px] text-red-400 mr-2">
+                {formik.errors.cover as string}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Excerpt */}
+        {/* Excerpt, Tags, Editor - مشابه قبل */}
         <FancyInputBox
           icon={<FiFileText />}
           label="خلاصه مقاله"
@@ -176,7 +242,7 @@ export default function EditBlogForm({
           {...formik.getFieldProps("excerpt")}
         />
 
-        {/* Tags */}
+        {/* Tags Section */}
         <div className="space-y-3">
           <label className="text-sm font-bold text-neon-blue flex items-center gap-2">
             <PiTagFill className="text-neon-green" /> انتخاب برچسب‌ها
@@ -190,7 +256,7 @@ export default function EditBlogForm({
                   className={twMerge(
                     "cursor-pointer px-4 py-1.5 rounded-xl text-xs font-bold transition-all border-2",
                     isSelected
-                      ? "bg-neon-blue/20 border-neon-blue text-neon-blue shadow-[0_0_10px_rgba(34,211,238,0.3)]"
+                      ? "bg-neon-blue/20 border-neon-blue text-neon-blue"
                       : "bg-slate-800 border-transparent text-gray-500 hover:border-slate-600",
                   )}
                 >
@@ -200,7 +266,9 @@ export default function EditBlogForm({
                     checked={isSelected}
                     onChange={() => {
                       const nextTags = isSelected
-                        ? formik.values.tags.filter((id) => id !== tag._id)
+                        ? formik.values.tags.filter(
+                            (id: string) => id !== tag._id,
+                          )
                         : [...formik.values.tags, tag._id];
                       formik.setFieldValue("tags", nextTags);
                     }}
@@ -221,7 +289,6 @@ export default function EditBlogForm({
             value={formik.values.content}
             onChange={(val) => {
               formik.setFieldValue("content", val);
-              formik.setFieldTouched("content", true, false);
             }}
           />
         </div>
@@ -253,16 +320,21 @@ export default function EditBlogForm({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 md:flex-none px-6 py-3 rounded-2xl bg-slate-800 text-gray-400 font-bold hover:bg-slate-700 transition-all"
+              className="px-6 py-3 rounded-2xl bg-slate-800 text-gray-400 font-bold hover:bg-slate-700 transition-all"
             >
               انصراف
             </button>
             <button
               type="submit"
-              disabled={formik.isSubmitting}
-              className="flex-1 md:flex-none px-10 py-3 rounded-2xl bg-gradient-to-r from-neon-green to-neon-blue text-black font-extrabold shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              disabled={formik.isSubmitting || isUploading}
+              className="px-10 py-3 rounded-2xl bg-gradient-to-r from-neon-green to-neon-blue text-black font-extrabold shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
-              <FaSave /> ذخیره نهایی
+              {formik.isSubmitting ? (
+                <FaSpinner className="animate-spin" />
+              ) : (
+                <FaSave />
+              )}
+              ذخیره نهایی
             </button>
           </div>
         </div>

@@ -1,8 +1,563 @@
-/* Night Owl Theme Syntax Highlighting for All Languages */
-code[class*="language-"], pre[class*="language-"] {
+/* ================================
+   Blog Content - Mani Alipour
+================================ */
+
+.blog-content {
+  width: 100%;
+  max-width: 100%;
+  color: #dbeafe;
+  font-family: var(--font-irsans), sans-serif;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  line-height: 2.15;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* جلوگیری از بیرون‌زدگی هر محتوایی */
+.blog-content * {
+  max-width: 100%;
+}
+
+/* پاراگراف‌ها */
+.blog-content p {
+  margin: 0 0 1.35rem;
+  color: #d7e3ea;
+  line-height: 2.15;
+  text-align: justify;
+}
+
+/* وقتی پاراگراف خالی از Tiptap می‌آید، فضا را نگه دارد */
+.blog-content p:empty,
+.blog-content p:has(br:only-child) {
+  min-height: 1.65em;
+  margin-bottom: 1rem;
+}
+
+/* تیترها */
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4 {
+  font-family: var(--font-yekan), sans-serif;
+  font-weight: 900;
+  line-height: 1.7;
+  scroll-margin-top: 6rem;
+}
+
+.blog-content h1 {
+  margin-top: 3rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.25);
+  color: var(--neon-blue);
+  font-size: clamp(2rem, 1.4rem + 2vw, 2.75rem);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.25);
+}
+
+.blog-content h2 {
+  margin-top: 3rem;
+  margin-bottom: 1.15rem;
+  padding-right: 1rem;
+  border-right: 4px solid var(--neon-green);
+  color: var(--neon-blue);
+  font-size: clamp(1.45rem, 1.1rem + 1.2vw, 2rem);
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.2);
+}
+
+.blog-content h3 {
+  margin-top: 2.35rem;
+  margin-bottom: 1rem;
+  color: var(--neon-green);
+  font-size: clamp(1.25rem, 1rem + 0.75vw, 1.55rem);
+}
+
+.blog-content h4 {
+  margin-top: 2rem;
+  margin-bottom: 0.85rem;
+  color: #67e8f9;
+  font-size: clamp(1.1rem, 1rem + 0.45vw, 1.3rem);
+}
+
+/* لینک‌ها */
+.blog-content a {
+  color: var(--neon-blue);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(34, 211, 238, 0.8);
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease,
+    text-shadow 0.25s ease;
+}
+
+.blog-content a:hover {
+  color: var(--neon-green);
+  border-bottom-color: var(--neon-green);
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.45);
+}
+
+/* لیست‌ها */
+.blog-content ul,
+.blog-content ol {
+  margin: 1.4rem 0 1.9rem;
+  padding-right: 1.35rem;
+}
+
+.blog-content ul {
+  list-style: none;
+}
+
+.blog-content ol {
+  list-style-position: outside;
+}
+
+.blog-content li {
+  position: relative;
+  margin-bottom: 0.85rem;
+  color: #d7e3ea;
+  line-height: 2.05;
+}
+
+.blog-content ul li {
+  padding-right: 1.35rem;
+}
+
+.blog-content ul li::before {
+  content: "•";
+  position: absolute;
+  top: -0.08em;
+  right: 0;
+  color: var(--neon-green);
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1.6;
+}
+
+.blog-content ol li::marker {
+  color: var(--neon-green);
+  font-weight: 800;
+}
+
+/* نقل‌قول */
+.blog-content blockquote {
+  margin: 2.2rem 0;
+  padding: 1.25rem 1.35rem;
+  border-right: 5px solid var(--neon-blue);
+  border-radius: 1rem 0 0 1rem;
+  background: linear-gradient(
+    to left,
+    rgba(34, 211, 238, 0.11),
+    rgba(34, 211, 238, 0.025),
+    transparent
+  );
+  color: #cbd5e1;
+  font-style: normal;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+}
+
+.blog-content blockquote p {
+  margin-bottom: 0;
+  color: #dbeafe;
+}
+
+/* تصاویر */
+.blog-content img {
+  display: block;
+  height: auto;
+  margin: 2.2rem auto;
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  border-radius: 1.25rem;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+}
+
+/* جدول‌ها */
+.blog-content table {
+  width: 100%;
+  margin: 2rem 0;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 1rem;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.blog-content th,
+.blog-content td {
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  padding: 0.85rem 1rem;
+  text-align: right;
+}
+
+.blog-content th {
+  background: rgba(8, 145, 178, 0.18);
+  color: #cffafe;
+  font-weight: 800;
+}
+
+.blog-content td {
+  background: rgba(15, 23, 42, 0.45);
+  color: #dbeafe;
+}
+
+/* جداکننده */
+.blog-content hr {
+  margin: 3rem 0;
+  border: 0;
+  border-top: 1px solid rgba(34, 211, 238, 0.2);
+}
+
+/* ================================
+   Inline Code
+================================ */
+
+.blog-content :not(pre) > code {
+  direction: ltr;
+  unicode-bidi: plaintext;
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid rgba(52, 211, 153, 0.18);
+  border-radius: 0.45rem;
+  background: rgba(52, 211, 153, 0.1);
+  color: var(--neon-green);
+  font-family: "Fira Mono", "Consolas", monospace;
+  font-size: 0.9em;
+  line-height: 1.7;
+  vertical-align: baseline;
+}
+
+/* ================================
+   Code Block
+================================ */
+
+.blog-content pre {
+  position: relative;
+  direction: ltr;
+  max-width: 100%;
+  margin: 2rem 0;
+  padding: 1.25rem;
+  overflow-x: auto;
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  border-radius: 1rem;
+  background: #011627;
+  box-shadow:
+    0 18px 55px rgba(0, 0, 0, 0.35),
+    0 0 30px rgba(34, 211, 238, 0.07);
+  -webkit-overflow-scrolling: touch;
+}
+
+.blog-content pre code {
+  direction: ltr;
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #d6deeb;
+  font-family: "Fira Mono", "Consolas", monospace;
+  font-size: 0.92rem;
+  line-height: 1.75;
+  text-align: left;
+  white-space: pre;
+  tab-size: 2;
+}
+
+/* برای اینکه کدهای بلند روی موبایل صفحه را نشکنند */
+.blog-content pre,
+.blog-content code {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.45) rgba(15, 23, 42, 0.75);
+}
+
+.blog-content pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.blog-content pre::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.75);
+  border-radius: 999px;
+}
+
+.blog-content pre::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.45);
+  border-radius: 999px;
+}
+
+/* ================================
+   Prism / Syntax Highlight
+================================ */
+
+code[class*="language-"],
+pre[class*="language-"] {
   color: #d6deeb;
   background: #011627;
-  font-family: 'Fira Mono', 'Consolas', monospace;
+  font-family: "Fira Mono", "Consolas", monospace;
+  text-shadow: none;
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  line-height: 1.65;
+  tab-size: 2;
+  hyphens: none;
+}
+
+.token.comment,
+.token.prolog,
+.token.cdata {
+  color: #637777;
+  font-style: italic;
+}
+
+.token.keyword,
+.token.atrule {
+  color: #c792ea;
+  font-style: italic;
+}
+
+.token.string,
+.token.char,
+.token.attr-value,
+.token.regex {
+  color: #ecc48d;
+}
+
+.token.number,
+.token.boolean,
+.token.constant,
+.token.symbol {
+  color: #f78c6c;
+}
+
+.token.property,
+.token.tag,
+.token.deleted {
+  color: #d6deeb;
+}
+
+.token.function,
+.token.class-name {
+  color: #82aaff;
+}
+
+.token.operator,
+.token.punctuation {
+  color: #7fdbca;
+}
+
+.token.variable,
+.token.selector,
+.token.important,
+.token.bold {
+  color: #addb67;
+  font-weight: 700;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.builtin,
+.token.inserted {
+  color: #addb67;
+  background: #002b3620;
+}
+
+/* Highlighted lines */
+pre[data-line] {
+  position: relative;
+}
+
+pre[class*="language-"] > code[data-highlighted-line] {
+  display: block;
+  margin-right: -1em;
+  margin-left: -1em;
+  padding-right: 1em;
+  padding-left: 0.75em;
+  background-color: #022b3a;
+}
+
+pre[class*="language-"] > code .highlight-line {
+  display: block;
+  margin-left: -1em;
+  margin-right: -1em;
+  padding-left: 1em;
+  border-left: 4px solid #7fdbca;
+  background-color: #2d4150;
+}
+
+code[class*="language-"] ::selection,
+pre[class*="language-"] ::selection {
+  background: #1b2b34;
+}
+
+/* ================================
+   Language Labels
+================================ */
+
+.blog-content pre[class*="language-"]::before {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.85rem;
+  z-index: 1;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.85);
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #7fdbca;
+  border: 1px solid rgba(127, 219, 202, 0.18);
+}
+
+.blog-content pre.language-javascript::before {
+  content: "JS";
+  color: #facc15;
+}
+
+.blog-content pre.language-typescript::before {
+  content: "TS";
+  color: #7fdbca;
+}
+
+.blog-content pre.language-tsx::before {
+  content: "TSX";
+  color: #7fdbca;
+}
+
+.blog-content pre.language-jsx::before {
+  content: "JSX";
+  color: #facc15;
+}
+
+.blog-content pre.language-css::before {
+  content: "CSS";
+  color: #82aaff;
+}
+
+.blog-content pre.language-html::before {
+  content: "HTML";
+  color: #ffcb8b;
+}
+
+.blog-content pre.language-python::before {
+  content: "PY";
+  color: #addb67;
+}
+
+.blog-content pre.language-json::before {
+  content: "JSON";
+  color: #ecc48d;
+}
+
+.blog-content pre.language-php::before {
+  content: "PHP";
+  color: #b0bec5;
+}
+
+.blog-content pre.language-cpp::before,
+.blog-content pre.language-c::before {
+  content: "CPP";
+  color: #f78c6c;
+}
+
+.blog-content pre.language-java::before {
+  content: "JAVA";
+  color: #f78c6c;
+}
+
+.blog-content pre.language-go::before {
+  content: "GO";
+  color: #82aaff;
+}
+
+.blog-content pre.language-ruby::before {
+  content: "RB";
+  color: #ff6363;
+}
+
+/* ================================
+   Responsive
+================================ */
+
+@media (max-width: 768px) {
+  .blog-content {
+    font-size: 1rem;
+    line-height: 2.05;
+  }
+
+  .blog-content p {
+    margin-bottom: 1.2rem;
+    line-height: 2.05;
+    text-align: right;
+  }
+
+  .blog-content h1 {
+    margin-top: 2.4rem;
+  }
+
+  .blog-content h2 {
+    margin-top: 2.5rem;
+    padding-right: 0.8rem;
+  }
+
+  .blog-content h3 {
+    margin-top: 2rem;
+  }
+
+  .blog-content blockquote {
+    margin: 1.8rem 0;
+    padding: 1.1rem 1rem;
+  }
+
+  .blog-content pre {
+    margin: 1.7rem -0.15rem;
+    padding: 1rem;
+    border-radius: 0.9rem;
+  }
+
+  .blog-content pre code {
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .blog-content img {
+    margin: 1.8rem auto;
+    border-radius: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-content {
+    font-size: 0.98rem;
+  }
+
+  .blog-content ul,
+  .blog-content ol {
+    padding-right: 1.1rem;
+  }
+
+  .blog-content ul li {
+    padding-right: 1.15rem;
+  }
+
+  .blog-content pre {
+    margin-right: -0.25rem;
+    margin-left: -0.25rem;
+  }
+
+  .blog-content pre code {
+    font-size: 0.78rem;
+  }
+}
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #d6deeb;
+  background: #011627;
+  font-family: "Fira Mono", "Consolas", monospace;
   text-shadow: none;
   direction: ltr;
   text-align: left;
@@ -106,37 +661,37 @@ pre[class*="language-"] ::selection {
 
 /* Language labels */
 .language-javascript::before {
-  content: 'js';
+  content: "js";
   color: #c792ea;
   font-size: 0.8em;
   margin-right: 0.5em;
 }
 .language-css::before {
-  content: 'css';
+  content: "css";
   color: #82aaff;
   font-size: 0.8em;
   margin-right: 0.5em;
 }
 .language-html::before {
-  content: 'html';
+  content: "html";
   color: #ffcb8b;
   font-size: 0.8em;
   margin-right: 0.5em;
 }
 .language-python::before {
-  content: 'py';
+  content: "py";
   color: #addb67;
   font-size: 0.8em;
   margin-right: 0.5em;
 }
 .language-typescript::before {
-  content: 'ts';
+  content: "ts";
   color: #7fdbca;
   font-size: 0.8em;
   margin-right: 0.5em;
 }
 .language-json::before {
-  content: 'json';
+  content: "json";
   color: #ecc48d;
   font-size: 0.8em;
   margin-right: 0.5em;
@@ -166,31 +721,32 @@ pre[class*="language-"] > code .highlight-line {
 
 /* Colors for other popular languages */
 .language-php::before {
-  content: 'php';
+  content: "php";
   color: #b0bec5;
   font-size: 0.8em;
   margin-right: 0.5em;
 }
-.language-cpp::before, .language-c::before {
-  content: 'cpp';
+.language-cpp::before,
+.language-c::before {
+  content: "cpp";
   color: #f78c6c;
   font-size: 0.8em;
   margin-right: 0.5em;
 }
 .language-java::before {
-  content: 'java';
+  content: "java";
   color: #f78c6c;
   font-size: 0.8em;
   margin-right: 0.5em;
 }
 .language-go::before {
-  content: 'go';
+  content: "go";
   color: #82aaff;
   font-size: 0.8em;
   margin-right: 0.5em;
 }
 .language-ruby::before {
-  content: 'rb';
+  content: "rb";
   color: #ff6363;
   font-size: 0.8em;
   margin-right: 0.5em;
