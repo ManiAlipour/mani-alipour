@@ -5,10 +5,16 @@ import RelatedBlogs from "@/components/sections/blogs/RelatedBlogs";
 import ShareBlogButton from "@/components/sections/blogs/ShareBlogButton";
 import Link from "next/link";
 import Image from "next/image";
-import { FaArrowRight, FaHashtag, FaRegClock, FaUser } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaHashtag,
+  FaRegClock,
+  FaUser,
+  FaRegEye,
+} from "react-icons/fa"; // FaRegEye اضافه شد
 import { MdOutlineDateRange } from "react-icons/md";
 import { notFound } from "next/navigation";
-import { setView } from "@/utils/api/set-view";
+import { getView, setView } from "@/utils/api/set-view";
 
 interface IBlogPage {
   params: Promise<{ slug: string }>;
@@ -41,7 +47,10 @@ export default async function BlogPage({ params }: IBlogPage) {
   const blog = await getBlog(slug);
 
   if (!blog) notFound();
+
+  // سیستم ثبت بازدید و دریافت آمار
   await setView(blog._id);
+  const views = await getView(blog._id);
 
   const allBlogs = await fetchPublishedBlogs({ limit: 6 });
   const related = allBlogs.filter((item) => item.slug !== slug).slice(0, 3);
@@ -69,7 +78,6 @@ export default async function BlogPage({ params }: IBlogPage) {
         </nav>
 
         <article className="mx-auto mt-7 w-full max-w-5xl px-4 pb-4 sm:px-5 md:mt-10 lg:px-6">
-          {/* Inner readable column */}
           <div className="mx-auto w-full max-w-4xl">
             {/* Blog Cover */}
             {blog.cover && (
@@ -83,12 +91,11 @@ export default async function BlogPage({ params }: IBlogPage) {
                   className="object-cover object-center transition-transform duration-700 hover:scale-105"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 896px"
                 />
-
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#08111f]/90 via-[#08111f]/15 to-transparent" />
               </div>
             )}
 
-            {/* Blog Title */}
+            {/* Blog Title & Meta */}
             <header
               className="mb-8 flex w-full flex-col gap-4 md:mb-10"
               dir="rtl"
@@ -98,11 +105,13 @@ export default async function BlogPage({ params }: IBlogPage) {
               </h1>
 
               <div className="flex flex-wrap items-center justify-start gap-2.5 text-sm font-medium text-cyan-100/90 sm:gap-3">
+                {/* Author */}
                 <span className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-cyan-700/35 bg-cyan-950/35 px-3 py-1.5">
                   <FaUser className="text-base text-cyan-400" />
                   <span dir="ltr">{blog.author?.name ?? "مانی علی‌پور"}</span>
                 </span>
 
+                {/* Date */}
                 <span className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-cyan-700/35 bg-cyan-950/35 px-3 py-1.5">
                   <MdOutlineDateRange className="text-lg text-emerald-400" />
                   <span>
@@ -117,6 +126,13 @@ export default async function BlogPage({ params }: IBlogPage) {
                   </span>
                 </span>
 
+                {/* Total Views - اضافه شده */}
+                <span className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-cyan-700/35 bg-cyan-950/35 px-3 py-1.5 text-cyan-300">
+                  <FaRegEye className="text-base text-cyan-400" />
+                  <span>{views?.toLocaleString("fa-IR") || 0} بازدید</span>
+                </span>
+
+                {/* Read Time */}
                 {blog.readAt && (
                   <span className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-amber-500/35 bg-amber-950/20 px-3 py-1.5 text-amber-300">
                     <FaRegClock className="text-base text-amber-400" />
@@ -143,7 +159,6 @@ export default async function BlogPage({ params }: IBlogPage) {
                   <FaHashtag className="text-lg text-neon-green" />
                   برچسب‌ها:
                 </span>
-
                 {blog.tags.map((t: any) => (
                   <Link
                     key={t._id}
@@ -158,12 +173,7 @@ export default async function BlogPage({ params }: IBlogPage) {
 
             {/* Blog Content */}
             <section
-              className="
-                blog-content
-                max-w-none
-                text-justify
-                text-slate-100
-              "
+              className="blog-content max-w-none text-justify text-slate-100"
               dir="rtl"
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
@@ -184,13 +194,11 @@ export default async function BlogPage({ params }: IBlogPage) {
                     )}
                   </span>
                 </p>
-
                 <span>
                   &copy; {new Date().getFullYear()}{" "}
                   <Link
                     href="/"
                     className="font-semibold text-neon-cyan hover:underline"
-                    title="من ialipour.ir"
                   >
                     manialipour.ir
                   </Link>{" "}
@@ -198,16 +206,15 @@ export default async function BlogPage({ params }: IBlogPage) {
                 </span>
               </div>
 
+              {/* Buy Me a Coffee Section */}
               <div className="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-slate-900/95 via-amber-950/25 to-orange-950/30 p-6 text-center shadow-[0_18px_55px_rgba(0,0,0,0.28)] sm:p-8 md:p-10">
                 <h3 className="mb-3 text-xl font-black text-amber-300 drop-shadow sm:text-2xl">
                   این مطلب برات مفید بود؟
                 </h3>
-
                 <p className="mx-auto mb-6 max-w-2xl text-sm leading-8 text-slate-300 sm:text-base">
                   با حمایتت بهم انرژی می‌دی که تولید محتوای تخصصی‌تر، رایگان و
                   باکیفیت‌تر رو ادامه بدم.
                 </p>
-
                 <a
                   href="https://coffeebede.ir/manialipour"
                   target="_blank"

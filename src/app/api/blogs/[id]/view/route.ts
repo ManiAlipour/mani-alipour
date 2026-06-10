@@ -14,15 +14,15 @@ export const GET = async (
   },
 ) => {
   try {
-    const admin = isAdmin(req);
+    // const admin = isAdmin(req);
 
-    if (!admin)
-      return NextResponse.json(
-        {
-          message: "دسترسی نامعتبر",
-        },
-        { status: 401 },
-      );
+    // if (!admin)
+    //   return NextResponse.json(
+    //     {
+    //       message: "دسترسی نامعتبر",
+    //     },
+    //     { status: 401 },
+    //   );
     await connectDB();
 
     const { id: postId } = await params;
