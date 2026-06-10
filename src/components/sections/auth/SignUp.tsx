@@ -207,7 +207,7 @@ const SignUpSchema = yup.object().shape({
     .required("ایمیل ضروری است"),
   password: yup
     .string()
-    .min(6, "رمز عبور باید حداقل ۶ کاراکتر باشد")
+    .min(8, "رمز عبور باید حداقل 8 کاراکتر باشد")
     .required("رمز عبور ضروری است"),
   confirmPassword: yup
     .string()

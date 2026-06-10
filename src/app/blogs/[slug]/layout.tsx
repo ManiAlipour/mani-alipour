@@ -66,7 +66,6 @@ function usePrismRtlEnhancements() {
       pre.appendChild(button);
     });
 
-    // Cleanup copy buttons on unmount
     return () => {
       document
         .querySelectorAll(".prism-copy-btn")

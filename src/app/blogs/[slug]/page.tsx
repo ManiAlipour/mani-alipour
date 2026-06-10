@@ -8,6 +8,7 @@ import Image from "next/image";
 import { FaArrowRight, FaHashtag, FaRegClock, FaUser } from "react-icons/fa";
 import { MdOutlineDateRange } from "react-icons/md";
 import { notFound } from "next/navigation";
+import { setView } from "@/utils/api/set-view";
 
 interface IBlogPage {
   params: Promise<{ slug: string }>;
@@ -40,6 +41,7 @@ export default async function BlogPage({ params }: IBlogPage) {
   const blog = await getBlog(slug);
 
   if (!blog) notFound();
+  await setView(blog._id);
 
   const allBlogs = await fetchPublishedBlogs({ limit: 6 });
   const related = allBlogs.filter((item) => item.slug !== slug).slice(0, 3);
