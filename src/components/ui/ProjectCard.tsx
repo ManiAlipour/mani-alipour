@@ -98,7 +98,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
         <div className="flex items-center justify-between mt-3">
           <span className="text-xs text-cyan-400 font-medium">
-            {project.updatedAt.toLocaleDateString("fa-IR", {
+            {new Date(project.updatedAt).toLocaleDateString("fa-IR", {
               year: "2-digit",
               month: "short",
               day: "numeric",

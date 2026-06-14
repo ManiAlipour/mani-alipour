@@ -1,6 +1,7 @@
 "use client";
+
 import { useFetch } from "iso-hooks";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -102,38 +103,165 @@ function Stats({ stats }: { stats: IStats | undefined }) {
   );
 }
 
+// =====================
+// Helpers
+// =====================
+
+async function uploadGalleryImages(files: File[]) {
+  if (!files.length) return [];
+
+  const uploadedUrls: string[] = [];
+
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      throw new Error(`آپلود فایل "${file.name}" با خطا مواجه شد.`);
+    }
+
+    const data = await res.json();
+
+    if (!data?.url) {
+      throw new Error(`URL فایل "${file.name}" از سرور دریافت نشد.`);
+    }
+
+    uploadedUrls.push(data.url);
+  }
+
+  return uploadedUrls;
+}
+
+function ImagePreviewGrid({
+  files,
+  existingUrls = [],
+  onRemoveFile,
+  onRemoveExisting,
+}: {
+  files?: File[];
+  existingUrls?: string[];
+  onRemoveFile?: (index: number) => void;
+  onRemoveExisting?: (index: number) => void;
+}) {
+  const filePreviews = useMemo(() => {
+    return (files || []).map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+  }, [files]);
+
+  React.useEffect(() => {
+    return () => {
+      filePreviews.forEach((item) => URL.revokeObjectURL(item.url));
+    };
+  }, [filePreviews]);
+
+  if (
+    (!files || files.length === 0) &&
+    (!existingUrls || existingUrls.length === 0)
+  ) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-3">
+      {!!existingUrls?.length && (
+        <div>
+          <div className="text-cyan-200 text-sm mb-2">تصاویر فعلی</div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {existingUrls.map((url, index) => (
+              <div
+                key={`${url}-${index}`}
+                className="relative rounded-xl overflow-hidden border border-cyan-900 bg-cyan-950/70"
+              >
+                <img
+                  src={url}
+                  alt={`gallery-${index}`}
+                  className="w-full h-28 object-cover"
+                />
+                {onRemoveExisting && (
+                  <button
+                    type="button"
+                    onClick={() => onRemoveExisting(index)}
+                    className="absolute top-1 left-1 bg-rose-700 hover:bg-rose-600 text-white text-xs px-2 py-1 rounded"
+                  >
+                    حذف
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!!filePreviews.length && (
+        <div>
+          <div className="text-cyan-200 text-sm mb-2">
+            تصاویر جدید انتخاب‌شده
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {filePreviews.map((item, index) => (
+              <div
+                key={`${item.file.name}-${index}`}
+                className="relative rounded-xl overflow-hidden border border-cyan-900 bg-cyan-950/70"
+              >
+                <img
+                  src={item.url}
+                  alt={item.file.name}
+                  className="w-full h-28 object-cover"
+                />
+                <div className="p-2 text-[11px] text-cyan-100 truncate">
+                  {item.file.name}
+                </div>
+                {onRemoveFile && (
+                  <button
+                    type="button"
+                    onClick={() => onRemoveFile(index)}
+                    className="absolute top-1 left-1 bg-rose-700 hover:bg-rose-600 text-white text-xs px-2 py-1 rounded"
+                  >
+                    حذف
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ==== Yup Validation Schemas ==== //
 const ProjectFormSchema = Yup.object().shape({
   title: Yup.string().required("عنوان پروژه الزامی است."),
   slug: Yup.string()
     .matches(
       /^[a-zA-Z0-9-]+$/,
-      "اسلاگ فقط باید شامل حروف انگلیسی، ارقام و - باشد."
+      "اسلاگ فقط باید شامل حروف انگلیسی، ارقام و - باشد.",
     )
     .required("اسلاگ الزامی است."),
   description: Yup.string().required("توضیحات الزامی است."),
   status: Yup.mixed<ProjectStatus>()
     .oneOf(["planned", "in-progress", "done", "archived"])
     .required("وضعیت پروژه الزامی است."),
-  techStack: Yup.string()
-    .required("تکنولوژی‌ها الزامی است."),
+  techStack: Yup.string().required("تکنولوژی‌ها الزامی است."),
   githubUrl: Yup.string()
     .url("آدرس GitHub معتبر نیست.")
     .nullable()
     .notRequired(),
-  demoUrl: Yup.string()
-    .url("آدرس دمو معتبر نیست.")
-    .nullable()
-    .notRequired(),
+  demoUrl: Yup.string().url("آدرس دمو معتبر نیست.").nullable().notRequired(),
   featured: Yup.boolean(),
   isPublished: Yup.boolean(),
-  order: Yup.number()
-    .nullable()
-    .typeError("شماره ترتیب باید عدد باشد."),
+  order: Yup.number().nullable().typeError("شماره ترتیب باید عدد باشد."),
 });
 
 // ---------------------
-// ویرایشگر پروژه - با ریسپانسیویتی بهبود یافته
+// ویرایشگر پروژه
 function UpdateProjectForm({
   project,
   onClose,
@@ -145,6 +273,10 @@ function UpdateProjectForm({
 }) {
   const [msg, setMsg] = useState<{ error?: string; succ?: string }>({});
   const [loading, setLoading] = useState(false);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [existingGallery, setExistingGallery] = useState<string[]>(
+    project.gallery || [],
+  );
 
   return (
     <div className="fixed top-0 left-0 w-full h-full z-50 bg-black bg-opacity-60 flex items-center justify-center px-2 sm:px-0">
@@ -166,6 +298,10 @@ function UpdateProjectForm({
           setLoading(true);
           setMsg({});
           try {
+            const uploadedNewImages = await uploadGalleryImages(galleryFiles);
+
+            const finalGallery = [...existingGallery, ...uploadedNewImages];
+
             const res = await fetch(
               `/api/projects/${encodeURIComponent(project.slug)}`,
               {
@@ -173,6 +309,7 @@ function UpdateProjectForm({
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   ...values,
+                  gallery: finalGallery,
                   techStack: values.techStack
                     .split(",")
                     .map((x: string) => x.trim())
@@ -182,9 +319,11 @@ function UpdateProjectForm({
                       ? Number(values.order)
                       : undefined,
                 }),
-              }
+              },
             );
+
             if (!res.ok) throw new Error("ویرایش پروژه با خطا مواجه شد.");
+
             const data = await res.json();
             onUpdate(data.data);
             setMsg({ succ: "پروژه با موفقیت ویرایش شد." });
@@ -198,7 +337,10 @@ function UpdateProjectForm({
         enableReinitialize
       >
         {({ isSubmitting, values, setFieldValue }) => (
-          <Form className="bg-cyan-950/95 border border-cyan-900 shadow-md rounded-2xl p-3 sm:p-6 flex flex-col gap-4 sm:gap-5 w-full max-w-lg sm:max-w-3xl relative" dir="rtl">
+          <Form
+            className="bg-cyan-950/95 border border-cyan-900 shadow-md rounded-2xl p-3 sm:p-6 flex flex-col gap-4 sm:gap-5 w-full max-w-lg sm:max-w-3xl relative max-h-[95vh] overflow-y-auto"
+            dir="rtl"
+          >
             <button
               type="button"
               onClick={onClose}
@@ -206,6 +348,7 @@ function UpdateProjectForm({
             >
               ✖
             </button>
+
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Field
                 name="title"
@@ -222,10 +365,12 @@ function UpdateProjectForm({
                 title="اسلاگ قابل ویرایش نیست"
               />
             </div>
+
             <div className="text-red-500 text-xs mt-0.5">
               <ErrorMessage name="title" />
               <ErrorMessage name="slug" />
             </div>
+
             <Field
               as="textarea"
               name="description"
@@ -233,9 +378,11 @@ function UpdateProjectForm({
               placeholder="توضیحات پروژه"
               required
             />
+
             <div className="text-red-500 text-xs mt-0.5">
               <ErrorMessage name="description" />
             </div>
+
             <div className="flex flex-col md:flex-row gap-2 sm:gap-3">
               <Field
                 as="select"
@@ -243,20 +390,25 @@ function UpdateProjectForm({
                 className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-1.5 sm:px-3 rounded w-full text-sm sm:text-base"
               >
                 <option value="planned">{STATUS_LABELS.planned}</option>
-                <option value="in-progress">{STATUS_LABELS["in-progress"]}</option>
+                <option value="in-progress">
+                  {STATUS_LABELS["in-progress"]}
+                </option>
                 <option value="done">{STATUS_LABELS.done}</option>
                 <option value="archived">{STATUS_LABELS.archived}</option>
               </Field>
+
               <Field
                 name="techStack"
                 className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-1.5 sm:px-3 rounded w-full text-sm sm:text-base"
                 placeholder="تکنولوژی‌ها (با , جدا کنید)"
               />
             </div>
+
             <div className="text-red-500 text-xs mt-0.5">
               <ErrorMessage name="status" />
               <ErrorMessage name="techStack" />
             </div>
+
             <div className="flex flex-col md:flex-row gap-2 sm:gap-3">
               <Field
                 name="githubUrl"
@@ -275,23 +427,57 @@ function UpdateProjectForm({
                 placeholder="شماره ترتیب"
               />
             </div>
+
             <div className="text-red-500 text-xs mt-0.5">
               <ErrorMessage name="githubUrl" />
               <ErrorMessage name="demoUrl" />
               <ErrorMessage name="order" />
             </div>
+
+            {/* Gallery Upload */}
+            <div className="flex flex-col gap-2">
+              <label className="text-cyan-100 text-sm font-bold">
+                گالری تصاویر پروژه
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  setGalleryFiles((prev) => [...prev, ...files]);
+                }}
+                className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-2 rounded w-full text-sm sm:text-base"
+              />
+
+              <ImagePreviewGrid
+                files={galleryFiles}
+                existingUrls={existingGallery}
+                onRemoveFile={(index) =>
+                  setGalleryFiles((prev) => prev.filter((_, i) => i !== index))
+                }
+                onRemoveExisting={(index) =>
+                  setExistingGallery((prev) =>
+                    prev.filter((_, i) => i !== index),
+                  )
+                }
+              />
+            </div>
+
             <div className="flex flex-col xs:flex-row gap-3 xs:gap-6 md:gap-8 justify-between items-center">
               <div className="flex items-center gap-2 xs:gap-1 text-cyan-100 text-sm">
                 <Field
                   type="checkbox"
                   name="isPublished"
                   checked={values.isPublished}
-                  onChange={() => setFieldValue("isPublished", !values.isPublished)}
+                  onChange={() =>
+                    setFieldValue("isPublished", !values.isPublished)
+                  }
                   className="accent-neon-blue"
                 />
-                {" "}
                 <span>منتشر شود</span>
               </div>
+
               <div className="flex items-center gap-2 xs:gap-1 text-cyan-100 text-sm">
                 <Field
                   type="checkbox"
@@ -300,22 +486,27 @@ function UpdateProjectForm({
                   onChange={() => setFieldValue("featured", !values.featured)}
                   className="accent-neon-blue"
                 />
-                {" "}
                 <span>ویژه</span>
               </div>
+
               <button
                 type="submit"
                 className="bg-neon-blue hover:bg-cyan-800 text-white font-bold px-4 sm:px-5 py-2 rounded-xl shadow transition disabled:opacity-60 min-w-[100px] sm:min-w-[120px] w-full xs:w-auto mt-2 xs:mt-0"
                 disabled={isSubmitting || loading}
               >
-                {isSubmitting || loading ? "در حال بروزرسانی..." : "ذخیره تغییرات"}
+                {isSubmitting || loading
+                  ? "در حال بروزرسانی..."
+                  : "ذخیره تغییرات"}
               </button>
             </div>
+
             {msg.error && (
               <div className="text-rose-400 text-sm font-bold">{msg.error}</div>
             )}
             {msg.succ && (
-              <div className="text-emerald-400 text-sm font-bold">{msg.succ}</div>
+              <div className="text-emerald-400 text-sm font-bold">
+                {msg.succ}
+              </div>
             )}
           </Form>
         )}
@@ -324,7 +515,7 @@ function UpdateProjectForm({
   );
 }
 
-// جدول ساده پروژه با ریسپانسیو موبایلی
+// جدول ساده پروژه
 function SimpleTable({
   projects,
   onDelete,
@@ -351,10 +542,8 @@ function SimpleTable({
     setDeleting(null);
   }
 
-  // Responsive Table for mobile
   return (
     <>
-      {/* دسکتاپ: جدول معمولی */}
       <div className="hidden sm:block overflow-auto rounded-2xl border border-cyan-900 bg-cyan-950/70 backdrop-blur-md shadow mb-10">
         <table className="min-w-full text-sm text-right font-vazir">
           <thead>
@@ -363,6 +552,7 @@ function SimpleTable({
               <th className="py-2 px-3 text-cyan-100">وضعیت</th>
               <th className="py-2 px-3 text-cyan-100">منتشر</th>
               <th className="py-2 px-3 text-cyan-100">ویژه</th>
+              <th className="py-2 px-3 text-cyan-100">گالری</th>
               <th className="py-2 px-3"></th>
             </tr>
           </thead>
@@ -375,7 +565,9 @@ function SimpleTable({
                 <td className="py-2 px-3 text-cyan-50">{p.title}</td>
                 <td className="py-2 px-3">
                   <span
-                    className={`px-2 py-0.5 rounded-lg font-bold shadow-sm ${STATUS_BG[p.status as ProjectStatus]} text-xs`}
+                    className={`px-2 py-0.5 rounded-lg font-bold shadow-sm ${
+                      STATUS_BG[p.status as ProjectStatus]
+                    } text-xs`}
                   >
                     {STATUS_LABELS[p.status as ProjectStatus] || p.status}
                   </span>
@@ -385,6 +577,9 @@ function SimpleTable({
                 </td>
                 <td className="py-2 px-3 text-center">
                   {p.featured ? <span title="ویژه">⭐</span> : "—"}
+                </td>
+                <td className="py-2 px-3 text-center">
+                  {p.gallery?.length ?? 0}
                 </td>
                 <td className="py-2 px-3 text-center flex space-x-1 space-x-reverse gap-1 justify-center">
                   <button
@@ -409,7 +604,7 @@ function SimpleTable({
             ))}
             {projects.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center py-7 text-cyan-200">
+                <td colSpan={6} className="text-center py-7 text-cyan-200">
                   هیچ پروژه‌ای ثبت نشده است.
                 </td>
               </tr>
@@ -418,7 +613,6 @@ function SimpleTable({
         </table>
       </div>
 
-      {/* موبایل: کارت‌های پروژه */}
       <div className="sm:hidden space-y-4 mb-10">
         {projects.length === 0 && (
           <div className="text-center py-7 text-cyan-200 border border-cyan-900 bg-cyan-950/70 rounded-2xl">
@@ -431,22 +625,30 @@ function SimpleTable({
             className="border border-cyan-900 bg-cyan-950/70 rounded-2xl shadow px-3 py-3 flex flex-col gap-2"
           >
             <div className="flex items-center justify-between">
-              <div className="font-bold text-neon-blue text-base">{p.title}</div>
+              <div className="font-bold text-neon-blue text-base">
+                {p.title}
+              </div>
               <span
-                className={`px-2 py-0.5 rounded-lg font-bold shadow-sm ${STATUS_BG[p.status as ProjectStatus]} text-xs whitespace-nowrap ml-1`}
+                className={`px-2 py-0.5 rounded-lg font-bold shadow-sm ${
+                  STATUS_BG[p.status as ProjectStatus]
+                } text-xs whitespace-nowrap ml-1`}
               >
                 {STATUS_LABELS[p.status as ProjectStatus] || p.status}
               </span>
             </div>
-            <div className="flex items-center gap-2 justify-start">
-              <span className="text-xs text-cyan-300 flex items-center gap-1">
+
+            <div className="flex items-center gap-2 justify-start flex-wrap">
+              <span className="text-xs text-cyan-300">
                 {p.isPublished ? "منتشرشده" : "منتشرنشده"}
               </span>
-              <span className="text-xs text-yellow-400 flex items-center gap-1">
+              <span className="text-xs text-yellow-400">
                 {p.featured ? "⭐ ویژه" : ""}
               </span>
-              {/* نمایش سفارش در موبایل؟ */}
+              <span className="text-xs text-cyan-300">
+                گالری: {p.gallery?.length ?? 0}
+              </span>
             </div>
+
             <div className="flex gap-2 justify-between mt-2 flex-wrap">
               <button
                 type="button"
@@ -476,6 +678,7 @@ function SimpleTable({
 function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
   const [msg, setMsg] = useState<{ error?: string; succ?: string }>({});
   const [loading, setLoading] = useState(false);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
 
   return (
     <Formik
@@ -483,7 +686,7 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
         title: "",
         slug: "",
         description: "",
-        status: "planned",
+        status: "planned" as ProjectStatus,
         techStack: "",
         githubUrl: "",
         demoUrl: "",
@@ -495,12 +698,16 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
       onSubmit={async (values, { resetForm, setSubmitting }) => {
         setLoading(true);
         setMsg({});
+
         try {
+          const galleryUrls = await uploadGalleryImages(galleryFiles);
+
           const res = await fetch("/api/projects", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               ...values,
+              gallery: galleryUrls,
               techStack: values.techStack
                 .split(",")
                 .map((x: string) => x.trim())
@@ -511,14 +718,19 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
                   : undefined,
             }),
           });
+
           if (!res.ok) throw new Error("ثبت پروژه با خطا مواجه شد.");
+
           const data = await res.json();
+
           onAdd(data.data);
           resetForm();
+          setGalleryFiles([]);
           setMsg({ succ: "پروژه اضافه شد." });
         } catch (e: any) {
           setMsg({ error: e?.message || "خطای ناشناخته" });
         }
+
         setSubmitting(false);
         setLoading(false);
       }}
@@ -542,10 +754,12 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
               required
             />
           </div>
+
           <div className="text-red-500 text-xs mt-0.5">
             <ErrorMessage name="title" />
             <ErrorMessage name="slug" />
           </div>
+
           <Field
             as="textarea"
             name="description"
@@ -553,9 +767,11 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
             placeholder="توضیحات پروژه"
             required
           />
+
           <div className="text-red-500 text-xs mt-0.5">
             <ErrorMessage name="description" />
           </div>
+
           <div className="flex flex-col md:flex-row gap-2 sm:gap-3">
             <Field
               as="select"
@@ -563,20 +779,25 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
               className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-1.5 sm:px-3 rounded w-full text-sm sm:text-base"
             >
               <option value="planned">{STATUS_LABELS.planned}</option>
-              <option value="in-progress">{STATUS_LABELS["in-progress"]}</option>
+              <option value="in-progress">
+                {STATUS_LABELS["in-progress"]}
+              </option>
               <option value="done">{STATUS_LABELS.done}</option>
               <option value="archived">{STATUS_LABELS.archived}</option>
             </Field>
+
             <Field
               name="techStack"
               className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-1.5 sm:px-3 rounded w-full text-sm sm:text-base"
               placeholder="تکنولوژی‌ها (با , جدا کنید)"
             />
           </div>
+
           <div className="text-red-500 text-xs mt-0.5">
             <ErrorMessage name="status" />
             <ErrorMessage name="techStack" />
           </div>
+
           <div className="flex flex-col md:flex-row gap-2 sm:gap-3">
             <Field
               name="githubUrl"
@@ -595,23 +816,51 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
               placeholder="شماره ترتیب"
             />
           </div>
+
           <div className="text-red-500 text-xs mt-0.5">
             <ErrorMessage name="githubUrl" />
             <ErrorMessage name="demoUrl" />
             <ErrorMessage name="order" />
           </div>
+
+          {/* Gallery Upload */}
+          <div className="flex flex-col gap-2">
+            <label className="text-cyan-100 text-sm font-bold">
+              گالری تصاویر پروژه
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                setGalleryFiles((prev) => [...prev, ...files]);
+              }}
+              className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-2 rounded w-full text-sm sm:text-base"
+            />
+
+            <ImagePreviewGrid
+              files={galleryFiles}
+              onRemoveFile={(index) =>
+                setGalleryFiles((prev) => prev.filter((_, i) => i !== index))
+              }
+            />
+          </div>
+
           <div className="flex flex-col xs:flex-row gap-3 xs:gap-6 md:gap-8 justify-between items-center">
             <div className="flex items-center gap-2 xs:gap-1 text-cyan-100 text-sm">
               <Field
                 type="checkbox"
                 name="isPublished"
                 checked={values.isPublished}
-                onChange={() => setFieldValue("isPublished", !values.isPublished)}
+                onChange={() =>
+                  setFieldValue("isPublished", !values.isPublished)
+                }
                 className="accent-neon-blue"
               />
-              {" "}
               <span>منتشر شود</span>
             </div>
+
             <div className="flex items-center gap-2 xs:gap-1 text-cyan-100 text-sm">
               <Field
                 type="checkbox"
@@ -620,9 +869,9 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
                 onChange={() => setFieldValue("featured", !values.featured)}
                 className="accent-neon-blue"
               />
-              {" "}
               <span>ویژه</span>
             </div>
+
             <button
               type="submit"
               className="bg-neon-blue hover:bg-cyan-800 text-white font-bold px-4 sm:px-5 py-2 rounded-xl shadow transition disabled:opacity-60 min-w-[100px] sm:min-w-[120px] w-full xs:w-auto mt-2 xs:mt-0"
@@ -631,6 +880,7 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
               {isSubmitting || loading ? "در حال ثبت..." : "افزودن پروژه"}
             </button>
           </div>
+
           {msg.error && (
             <div className="text-rose-400 text-sm font-bold">{msg.error}</div>
           )}
@@ -649,11 +899,13 @@ export default function ProjectsPage() {
     loading: loadingProjects,
     error: errorProjects,
   } = useFetch<IProjectResponse>("/api/projects");
+
   const {
     data: projectStatsResponse,
     loading: loadingStats,
     error: errorStats,
   } = useFetch<IProjectStatsResponse>("/api/admin/analytics/projects");
+
   const [projects, setProjects] = useState<IProject[]>([]);
   const [editingProject, setEditingProject] = useState<IProject | null>(null);
 
@@ -663,16 +915,20 @@ export default function ProjectsPage() {
 
   const handleAddProject = (project: IProject) =>
     setProjects((prev) => [project, ...prev]);
+
   const handleDeleteProject = (slug: string) =>
     setProjects((prev) => prev?.filter((p) => p.slug !== slug) ?? []);
+
   const handleEditProjectClick = (project: IProject) =>
     setEditingProject(project);
+
   const handleUpdateProject = (updatedProject: IProject) => {
     setProjects((prev) =>
       prev.map((p) => (p.slug === updatedProject.slug ? updatedProject : p)),
     );
     setEditingProject(null);
   };
+
   const handleCloseUpdate = () => setEditingProject(null);
 
   return (
@@ -680,6 +936,7 @@ export default function ProjectsPage() {
       <h1 className="text-2xl md:text-3xl font-extrabold mb-2 text-neon-blue drop-shadow text-center">
         مدیریت پروژه‌های سایت
       </h1>
+
       <p className="mb-7 text-cyan-100/80 text-center text-base md:text-lg">
         ثبت و آرشیو پیشرفته پروژه‌ها با تم اختصاصی داشبورد
       </p>
@@ -698,6 +955,7 @@ export default function ProjectsPage() {
 
       <section>
         <AddProjectForm onAdd={handleAddProject} />
+
         {loadingProjects ? (
           <div className="text-cyan-100/70 text-center my-8">
             در حال بارگذاری پروژه‌ها...
@@ -713,6 +971,7 @@ export default function ProjectsPage() {
               onDelete={handleDeleteProject}
               onEdit={handleEditProjectClick}
             />
+
             {editingProject && (
               <UpdateProjectForm
                 project={editingProject}

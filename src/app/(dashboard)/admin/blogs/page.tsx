@@ -188,7 +188,7 @@ export default function BlogPage() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 gap-8 mt-10 lg:grid-cols-2">
-        {/* -------- Doughnut Chart Card -------- */}
+        {/* Doughnut Chart Card */}
         <div className="p-6 border shadow-lg bg-slate-900/40 rounded-2xl border-cyan-600 backdrop-blur-xl">
           <p className="mb-6 text-xl font-bold text-center text-cyan-100">
             نسبت مقالات منتشر شده به پیش‌نویس
@@ -203,7 +203,7 @@ export default function BlogPage() {
           </div>
         </div>
 
-        {/* -------- Bar Chart Card -------- */}
+        {/* Bar Chart Card */}
         <div className="p-6 border shadow-lg bg-slate-900/40 rounded-2xl border-cyan-600 backdrop-blur-xl">
           <p className="mb-6 text-xl font-bold text-center text-cyan-100">
             آمار ماهانه مقالات

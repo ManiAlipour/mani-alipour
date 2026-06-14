@@ -279,7 +279,9 @@ export default function SignUp() {
 
               if (res.ok) {
                 resetForm();
-                router.replace("/");
+                router.replace(
+                  `/auth/verify?email=${encodeURIComponent(values.email)}`,
+                );
               } else {
                 if (body?.message) {
                   setErrors({ email: body.message });

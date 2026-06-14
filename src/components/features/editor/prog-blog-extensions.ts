@@ -12,7 +12,7 @@ import { TableCell } from "@tiptap/extension-table-cell";
 import { TableHeader } from "@tiptap/extension-table-header";
 import { createLowlight, common } from "lowlight";
 
-export const lowlight = createLowlight(common);
+const lowlight = createLowlight(common);
 
 export const CODE_LANGUAGES = [
   { id: "javascript", label: "JavaScript" },

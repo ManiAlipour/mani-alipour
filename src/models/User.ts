@@ -6,6 +6,8 @@ export interface IUserDocument extends Document {
   password: string;
   role: "user" | "admin";
   likedBlogs: mongoose.Types.ObjectId[];
+  otpCode?: number;
+  otpExpires?: Date;
 }
 
 const userSchema = new Schema<IUserDocument>(
@@ -42,6 +44,18 @@ const userSchema = new Schema<IUserDocument>(
         _id: false,
       },
     ],
+
+    otpCode: {
+      type: Number,
+      required: false,
+      default: null,
+    },
+
+    otpExpires: {
+      type: Date,
+      required: false,
+      default: null,
+    },
   },
   { timestamps: true },
 );

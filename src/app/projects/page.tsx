@@ -17,10 +17,12 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
   const { q = "", status = "" } = await searchParams;
   const projects = await fetchPublishedProjects({ q, status, limit: 100 });
 
+  console.log(projects);
+
   const hasFilters = Boolean(q || status);
   const featured =
     !hasFilters && projects.length
-      ? projects.find((p) => p.featured) ?? projects[0]
+      ? (projects.find((p) => p.featured) ?? projects[0])
       : null;
   const rest = featured
     ? projects.filter((p) => p._id !== featured._id)
@@ -85,7 +87,9 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
 
         <div className="rounded-3xl border border-cyan-500/15 bg-[#111b2e]/80 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6">
           <Suspense
-            fallback={<div className="h-24 animate-pulse rounded-2xl bg-white/5" />}
+            fallback={
+              <div className="h-24 animate-pulse rounded-2xl bg-white/5" />
+            }
           >
             <ProjectFilters />
           </Suspense>

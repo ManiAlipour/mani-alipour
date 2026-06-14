@@ -1,4 +1,4 @@
-import { apiFetch } from ".";
+import { apiFetch } from "..";
 
 export const setView = async (id: string) => {
   try {

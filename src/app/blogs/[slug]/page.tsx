@@ -1,4 +1,4 @@
-import { getBlog } from "@/utils/api/get-blog";
+import { getBlog } from "@/utils/api/blog/get-blog";
 import { fetchPublishedBlogs } from "@/lib/data/blogs";
 import ReadingProgress from "@/components/sections/blogs/ReadingProgress";
 import RelatedBlogs from "@/components/sections/blogs/RelatedBlogs";
@@ -11,10 +11,12 @@ import {
   FaRegClock,
   FaUser,
   FaRegEye,
-} from "react-icons/fa"; // FaRegEye اضافه شد
+  FaStar,
+} from "react-icons/fa";
 import { MdOutlineDateRange } from "react-icons/md";
 import { notFound } from "next/navigation";
-import { getView, setView } from "@/utils/api/set-view";
+import { getView, setView } from "@/utils/api/blog/set-view";
+import { PiCoffeeFill } from "react-icons/pi";
 
 interface IBlogPage {
   params: Promise<{ slug: string }>;
@@ -48,7 +50,6 @@ export default async function BlogPage({ params }: IBlogPage) {
 
   if (!blog) notFound();
 
-  // سیستم ثبت بازدید و دریافت آمار
   await setView(blog._id);
   const views = await getView(blog._id);
 
@@ -126,7 +127,6 @@ export default async function BlogPage({ params }: IBlogPage) {
                   </span>
                 </span>
 
-                {/* Total Views - اضافه شده */}
                 <span className="inline-flex min-h-9 items-center gap-2 rounded-xl border border-cyan-700/35 bg-cyan-950/35 px-3 py-1.5 text-cyan-300">
                   <FaRegEye className="text-base text-cyan-400" />
                   <span>{views?.toLocaleString("fa-IR") || 0} بازدید</span>
@@ -194,34 +194,29 @@ export default async function BlogPage({ params }: IBlogPage) {
                     )}
                   </span>
                 </p>
-                <span>
-                  &copy; {new Date().getFullYear()}{" "}
-                  <Link
-                    href="/"
-                    className="font-semibold text-neon-cyan hover:underline"
-                  >
-                    manialipour.ir
-                  </Link>{" "}
-                  — تمامی حقوق محفوظ است.
-                </span>
               </div>
 
               {/* Buy Me a Coffee Section */}
-              <div className="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-slate-900/95 via-amber-950/25 to-orange-950/30 p-6 text-center shadow-[0_18px_55px_rgba(0,0,0,0.28)] sm:p-8 md:p-10">
-                <h3 className="mb-3 text-xl font-black text-amber-300 drop-shadow sm:text-2xl">
-                  این مطلب برات مفید بود؟
+              <div className="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-slate-900/95 via-amber-950/25 to-orange-950/30 p-8 text-center shadow-[0_18px_55px_rgba(0,0,0,0.28)] sm:p-10">
+                <h3 className="flex flex-col items-center justify-center gap-3 mb-4 text-xl font-black text-amber-300 drop-shadow sm:flex-row sm:text-2xl">
+                  {/* اضافه کردن flex-col در موبایل باعث میشه آیکون و متن زیر هم بیان و فضا بازتر بشه */}
+                  <FaStar className="animate-bounce" />
+                  <span>این مطلب برات مفید بود؟</span>
                 </h3>
-                <p className="mx-auto mb-6 max-w-2xl text-sm leading-8 text-slate-300 sm:text-base">
+
+                <p className="mx-auto mb-8 max-w-2xl text-[15px] leading-[1.8] text-slate-300 px-2 sm:px-0 sm:text-base sm:leading-8">
                   با حمایتت بهم انرژی می‌دی که تولید محتوای تخصصی‌تر، رایگان و
                   باکیفیت‌تر رو ادامه بدم.
                 </p>
+
                 <a
                   href="https://coffeebede.ir/manialipour"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-amber-400 px-6 py-3 text-sm font-black text-[#181818] shadow-xl shadow-amber-400/15 transition-all hover:scale-[1.03] hover:bg-amber-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-amber-300 sm:px-7 sm:text-base"
+                  className="inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-xl bg-amber-400 px-6 py-3 text-[15px] font-black text-[#181818] shadow-xl shadow-amber-400/15 transition-all hover:scale-[1.03] hover:bg-amber-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-amber-300 sm:w-auto sm:px-7 sm:text-base"
                 >
-                  ☕️ یه قهوه مهمونم کن
+                  <PiCoffeeFill className="text-xl" />
+                  یه قهوه مهمونم کن
                 </a>
               </div>
             </footer>

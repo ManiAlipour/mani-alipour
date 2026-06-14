@@ -48,7 +48,11 @@ export default function ProjectCard({
             src={project.coverImage}
             alt={project.title}
             fill
-            sizes={featured ? "(max-width: 1024px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"}
+            sizes={
+              featured
+                ? "(max-width: 1024px) 100vw, 50vw"
+                : "(max-width: 768px) 100vw, 33vw"
+            }
             className={`object-cover transition-transform duration-700 group-hover:scale-110 ${
               project.status === "in-progress" ? "grayscale-[20%]" : ""
             }`}
@@ -74,7 +78,9 @@ export default function ProjectCard({
         </div>
       </Link>
 
-      <div className={`flex flex-1 flex-col gap-4 p-6 ${featured ? "lg:justify-center" : ""}`}>
+      <div
+        className={`flex flex-1 flex-col gap-4 p-6 ${featured ? "lg:justify-center" : ""}`}
+      >
         <div className="flex items-center justify-between gap-3 text-xs text-cyan-300/70">
           <span className="rounded-full border border-white/5 bg-white/5 px-2.5 py-1">
             {formatDate(project.updatedAt)}
@@ -125,7 +131,9 @@ export default function ProjectCard({
             className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-500/15 px-4 py-2 text-sm font-bold text-cyan-100 transition hover:bg-cyan-500/25"
           >
             جزئیات پروژه
-            <span className="transition-transform group-hover:-translate-x-1">←</span>
+            <span className="transition-transform group-hover:-translate-x-1">
+              ←
+            </span>
           </Link>
           {project.demoUrl ? (
             <a

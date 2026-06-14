@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/mongodb";
 import Project, { type ProjectStatus } from "@/models/Projects";
+import { serializeProject } from "@/utils/serializer/projects";
 
 export async function fetchPublishedProjects({
   q = "",
@@ -39,13 +40,21 @@ export async function fetchPublishedProjects({
     filters.featured = true;
   }
 
-  return Project.find(filters)
+  // ۱. اول با await دیتا رو بگیر
+  const projects = await Project.find(filters)
     .sort({ featured: -1, order: 1, createdAt: -1 })
     .limit(limit)
-    .lean() as Promise<TProject[]>;
+    .lean();
+
+  const serializedProjects = projects.map(serializeProject);
+
+  return serializedProjects;
 }
 
 export async function fetchProjectBySlug(slug: string) {
   await connectDB();
-  return Project.findOne({ slug, isPublished: true }).lean() as Promise<TProject | null>;
+  return Project.findOne({
+    slug,
+    isPublished: true,
+  }).lean() as Promise<TProject | null>;
 }

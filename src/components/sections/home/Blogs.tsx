@@ -1,7 +1,6 @@
 import BlogCard from "@/components/ui/BlogCard";
-import React from "react";
+import { getBlogs } from "@/utils/api/blog/get-blogs";
 
-const blogs: any[] = [];
 
 function BlogsNotFound() {
   return (
@@ -28,7 +27,9 @@ function BlogsNotFound() {
   );
 }
 
-export default function Blogs() {
+export default async function Blogs() {
+  const blogs = await getBlogs("", "", 3);
+
   return (
     <section
       id="blogs"
@@ -60,7 +61,7 @@ export default function Blogs() {
         <BlogsNotFound />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
-          {blogs.map((blog) => (
+          {blogs.map((blog: TBlog) => (
             <BlogCard key={blog.slug} blog={blog} />
           ))}
         </div>

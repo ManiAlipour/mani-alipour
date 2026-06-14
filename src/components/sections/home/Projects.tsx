@@ -1,6 +1,5 @@
 import ProjectCard from "@/components/ui/ProjectCard";
-
-const projects: any[] = [];
+import { getProjects } from "@/utils/api/projects/get-projecrs";
 
 function ProjectNotFound() {
   return (
@@ -39,10 +38,12 @@ function ProjectNotFound() {
 }
 
 export interface ProjectCardProps {
-  project: any;
+  project: TProject;
 }
 
-export default function Projects() {
+export default async function Projects() {
+  const projects = (await getProjects()) as TProject[];
+
   return (
     <section
       id="projects"

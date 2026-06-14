@@ -15,6 +15,8 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search") || "";
     const tag = searchParams.get("tag") || "";
 
+      console.log("LIMIT:", searchParams.get("limit"));
+
     await connectDB();
     const result = await getBlogsService(limit, page, search, tag);
 

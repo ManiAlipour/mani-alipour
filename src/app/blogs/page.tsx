@@ -1,67 +1,134 @@
+import { Suspense } from "react";
+import Link from "next/link";
 import BlogNotFound from "@/components/sections/blogs/BlogNotFound";
 import SearchBox from "@/components/sections/blogs/SearchBox";
 import TagsSecton from "@/components/sections/blogs/TagsSecton";
 import BlogCard from "@/components/ui/BlogCard";
-import { getBlogs } from "@/utils/api/get-blogs";
+import { getBlogs } from "@/utils/api/blog/get-blogs";
 import { getTags } from "@/utils/api/get-tags";
-import { LuBookText } from "react-icons/lu";
+import { LuBookText, LuFileText, LuTags, LuSparkles } from "react-icons/lu";
 
 export type PageProps = {
   searchParams: Promise<{
-    search: string;
-    tag: string;
+    search?: string;
+    tag?: string;
   }>;
 };
 
 export default async function BlogsPage({ searchParams }: PageProps) {
-  const { search, tag } = await searchParams;
+  const { search = "", tag = "" } = await searchParams;
+
   const blogs = await getBlogs(search, tag);
   const tags = await getTags();
 
-  return (
-    <div className="min-h-lvh px-2 sm:px-4 py-4 sm:py-8 bg-gradient-to-br from-slate-800 to-neon-blue/30">
-      {/* Title */}
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-2 px-2 sm:px-10 py-4 sm:py-5 items-start sm:items-center">
-        <div className="flex items-center gap-2">
-          <LuBookText className="text-2xl sm:text-3xl" />
-          <h2 className="text-2xl sm:text-3xl font-bold">مقالات من</h2>
-        </div>
-        <span className="text-cyan-200/70 text-base sm:text-lg mt-1 sm:mt-0 sm:ml-auto sm:mr-10">
-          {blogs.length} مقاله
-        </span>
-      </div>
-      <p className="text-cyan-200/70 text-sm sm:text-base md:text-lg px-2 sm:px-10 mb-6">
-        درباره توسعه نرم‌افزار، تکنولوژی‌های وب و ساخت تجربه‌های دیجیتالی که
-        متمایز هستند.
-      </p>
-      {/* Search Bar */}
-      <div className="my-6 sm:my-10 px-0 sm:px-10">
-        <SearchBox />
-      </div>
-      {/* Tags Section */}
-      <TagsSecton tags={tags} />
+  const hasFilters = Boolean(search || tag);
 
-      {/* Blog Lists */}
-      <h3 className="text-lg sm:text-2xl font-bold mx-4 sm:mx-20 my-6 sm:my-10">
-        لیست مقالات
-      </h3>
-      {blogs.length ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 sm:gap-8 max-w-full sm:max-w-6xl mx-auto">
-          {blogs.map((blog: TBlog) => (
-            <BlogCard key={blog.slug} blog={blog} />
-          ))}
+  return (
+    <div className="relative min-h-screen overflow-hidden bg-[#0b1220] pb-24">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 left-1/2 h-[420px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-500/15 via-cyan-500/10 to-emerald-500/10 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl"
+      />
+
+      <section className="relative mx-auto max-w-7xl px-4 pt-16 sm:px-6 lg:px-8">
+        <div className="mb-12 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-400/25 bg-indigo-500/10 px-4 py-1.5 text-sm font-bold text-indigo-200">
+              <LuBookText />
+              وبلاگ
+            </div>
+
+            <h1 className="text-4xl font-black leading-tight text-white sm:text-5xl">
+              نوشته‌هایی درباره
+              <span className="block bg-gradient-to-l from-indigo-300 via-cyan-200 to-emerald-300 bg-clip-text text-transparent">
+                توسعه وب و تجربه دیجیتال
+              </span>
+            </h1>
+
+            <p className="mt-4 text-base leading-8 text-cyan-100/70 sm:text-lg">
+              درباره توسعه نرم‌افزار، تکنولوژی‌های وب، معماری فرانت‌اند، نکات
+              کاربردی برنامه‌نویسی و ساخت تجربه‌های دیجیتالی متمایز.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 sm:gap-4">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-md">
+              <p className="text-2xl font-black text-cyan-300 sm:text-3xl">
+                {blogs.length}
+              </p>
+              <p className="text-xs text-cyan-200/60">مقاله</p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-md">
+              <p className="text-2xl font-black text-emerald-300 sm:text-3xl">
+                {tags.length}
+              </p>
+              <p className="text-xs text-cyan-200/60">تگ</p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-md">
+              <p className="text-2xl font-black text-amber-300 sm:text-3xl">
+                {hasFilters ? "فعال" : "همه"}
+              </p>
+              <p className="text-xs text-cyan-200/60">فیلتر</p>
+            </div>
+          </div>
         </div>
-      ) : (
-        <div className="px-2 sm:px-10">
-          <BlogNotFound />
+
+        <div className="rounded-3xl border border-cyan-500/15 bg-[#111b2e]/80 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6">
+          <div className="grid gap-6">
+            <Suspense
+              fallback={
+                <div className="h-14 animate-pulse rounded-2xl bg-white/5" />
+              }
+            >
+              <SearchBox />
+            </Suspense>
+
+            <div className="border-t border-white/10 pt-5">
+              <TagsSecton tags={tags} />
+            </div>
+          </div>
         </div>
-      )}
-      <div className="block sm:hidden mt-10">
-        <div className="flex justify-between items-center gap-3 text-xs text-slate-400">
-          <span>← اسکرول کنید</span>
-          <span>نتایج بیشتر را ببینید</span>
+
+        <div className="mt-12">
+          <div className="mb-6 flex items-center justify-between gap-4">
+            <div>
+              <div className="mb-2 flex items-center gap-2 text-sm font-bold text-indigo-300">
+                <LuSparkles />
+                {hasFilters ? "نتایج فیلتر شده" : "آخرین نوشته‌ها"}
+              </div>
+
+              <h2 className="text-2xl font-black text-cyan-50">
+                {hasFilters ? "نتایج جستجو" : "همه مقالات"}
+              </h2>
+            </div>
+
+            {hasFilters ? (
+              <Link
+                href="/blogs"
+                className="text-sm font-medium text-cyan-400 transition hover:text-cyan-300"
+              >
+                مشاهده همه
+              </Link>
+            ) : null}
+          </div>
+
+          {blogs.length ? (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+              {blogs.map((blog: TBlog) => (
+                <BlogCard key={blog.slug} blog={blog} />
+              ))}
+            </div>
+          ) : (
+            <BlogNotFound />
+          )}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

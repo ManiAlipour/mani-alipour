@@ -2,6 +2,7 @@ import { RegisterInput } from "@/lib/validators/auth.validator";
 import User from "@/models/User";
 import { comparePassword, hashPassword } from "@/utils/bcrypt";
 import { signJWT } from "@/utils/jwt";
+import { generateOTP } from "@/utils/otp";
 
 export async function loginService({
   email,
@@ -38,6 +39,7 @@ export async function loginService({
 
 export async function registerService(input: RegisterInput) {
   const existingUser = await User.findOne({ email: input.email });
+
   if (existingUser) {
     throw new Error(
       "این ایمیل قبلاً ثبت شده است. لطفاً با رمز دیگر وارد شوید یا ایمیل دیگری استفاده کنید.",
@@ -45,21 +47,18 @@ export async function registerService(input: RegisterInput) {
   }
 
   const hashedPassword = await hashPassword(input.password);
+  const otpCode = generateOTP();
+
+  const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
   const newUser = await User.create({
     name: input.name,
     email: input.email,
     password: hashedPassword,
     role: "user",
+    otpCode,
+    otpExpires,
   });
-
-  const tokenPayload = {
-    userId: newUser._id,
-    email: newUser.email,
-    role: newUser.role,
-  };
-
-  const token = signJWT(tokenPayload, "30d");
 
   return {
     user: {
@@ -67,7 +66,8 @@ export async function registerService(input: RegisterInput) {
       name: newUser.name,
       email: newUser.email,
       role: newUser.role,
+      otpCode,
+      otpExpires,
     },
-    token: token,
   };
 }

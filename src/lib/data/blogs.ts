@@ -34,19 +34,3 @@ export async function fetchBlogBySlug(slug: string): Promise<BlogDTO | null> {
     return null;
   }
 }
-
-export async function fetchAllTags() {
-  await connectDB();
-
-  const tags = await Tag.find().sort({ name: 1 }).lean();
-
-  return tags.map((tag) => ({
-    _id: tag._id.toString(),
-    name: tag.name,
-    slug: tag.slug,
-    description: tag.description ?? "",
-    postCount: tag.postCount ?? 0,
-    createdAt: tag.createdAt ? tag.createdAt.toISOString() : null,
-    updatedAt: tag.updatedAt ? tag.updatedAt.toISOString() : null,
-  }));
-}

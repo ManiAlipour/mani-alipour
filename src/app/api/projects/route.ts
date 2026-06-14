@@ -4,20 +4,15 @@ import { connectDB } from "@/lib/mongodb";
 import { isAdmin } from "@/lib/middleware/admin";
 import type { ProjectStatus } from "@/models/Projects";
 import { projectValidator } from "@/lib/validators/project.validator";
-
-/**
- * Only permit query/search and creation based on what exists in the @models/Projects model.
- */
+import { serializeProject } from "@/utils/serializer/projects";
 
 export const GET = async (req: NextRequest) => {
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);
 
-    // Construct filters only from schema fields
     const filters: Record<string, any> = {};
 
-    // Fulltext search
     if (searchParams.has("q")) {
       const q = searchParams.get("q")!;
       filters.$or = [
@@ -28,7 +23,6 @@ export const GET = async (req: NextRequest) => {
       ];
     }
 
-    // Boolean filters for isPublished, featured
     if (searchParams.has("isPublished")) {
       const val = searchParams.get("isPublished");
       if (val === "true" || val === "false")
@@ -39,7 +33,6 @@ export const GET = async (req: NextRequest) => {
       if (val === "true" || val === "false") filters.featured = val === "true";
     }
 
-    // Status filter - must be a valid ProjectStatus
     if (searchParams.has("status")) {
       const status = searchParams.get("status");
       const validStatus: ProjectStatus[] = [
@@ -53,12 +46,11 @@ export const GET = async (req: NextRequest) => {
       }
     }
 
-    // Slug filter (unique, string)
+    // Slug filter
     if (searchParams.has("slug")) {
       filters.slug = searchParams.get("slug")?.toLowerCase();
     }
 
-    // Pagination
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const limit = Math.max(
       1,
@@ -74,9 +66,11 @@ export const GET = async (req: NextRequest) => {
 
     const total = await Project.countDocuments(filters);
 
+    const serializedProjects = projects.map(serializeProject);
+
     return NextResponse.json({
       message: "Projects fetched successfully",
-      data: projects,
+      data: serializedProjects,
       total,
       page,
       pageSize: limit,
