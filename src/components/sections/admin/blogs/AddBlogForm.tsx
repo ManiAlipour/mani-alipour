@@ -13,6 +13,7 @@ import { BsImage } from "react-icons/bs";
 import { twMerge } from "tailwind-merge";
 import toast from "react-hot-toast";
 import FancyInputBox from "./Input";
+import { UploadButton } from "@/utils/uploadthing";
 
 const validationSchema = yup.object({
   title: yup.string().required("عنوان مقاله رو وارد نکردی"),
@@ -180,11 +181,28 @@ export default function AddBlogForm({ refetch }: { refetch: any }) {
               <BsImage className="text-neon-blue" /> آپلود کاور
             </label>
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleUpload}
-              className="w-full p-3 text-sm border rounded-xl bg-white/5 border-white/10"
+            <UploadButton
+              endpoint="imageUploader"
+              onUploadBegin={() => {
+                setIsUploading(true);
+                toast.loading("در حال آپلود...", { id: "upload" });
+              }}
+              onClientUploadComplete={(res: any) => {
+                const url = res?.[0]?.url;
+
+                if (url) {
+                  formik.setFieldValue("cover", url);
+                  toast.success("آپلود با موفقیت انجام شد ✅", {
+                    id: "upload",
+                  });
+                }
+
+                setIsUploading(false);
+              }}
+              onUploadError={(error: Error) => {
+                toast.error(`خطا در آپلود: ${error.message}`, { id: "upload" });
+                setIsUploading(false);
+              }}
             />
 
             {isUploading && (

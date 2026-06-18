@@ -5,6 +5,62 @@ import ProjectFilters from "@/components/sections/projects/ProjectFilters";
 import ProjectsEmpty from "@/components/sections/projects/ProjectsEmpty";
 import { fetchPublishedProjects } from "@/lib/data/projects";
 import { LuLayers, LuRocket } from "react-icons/lu";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "نمونه کارها و پروژه های طراحی سایت | مانی علیپور",
+  description:
+    "مشاهده نمونه‌کارها و پروژه‌های مانی علیپور در زمینه طراحی و توسعه وب، طراحی سایت با Next.js، توسعه فول استک، پنل ادمین، وبلاگ حرفه‌ای و رابط کاربری مدرن.",
+
+  keywords: [
+    "نمونه کار طراحی سایت",
+    "نمونه کار برنامه نویسی وب",
+    "پروژه طراحی سایت",
+    "پروژه Next.js",
+    "نمونه کار Next.js",
+    "نمونه کار فول استک",
+    "طراحی سایت با Next.js",
+    "توسعه وب فول استک",
+    "مانی علیپور",
+    "Mani Alipour projects",
+    "Next.js portfolio",
+  ],
+
+  alternates: {
+    canonical: "https://manialipour.ir/projects",
+  },
+
+  openGraph: {
+    title: "نمونه‌کارها و پروژه‌های طراحی سایت | مانی علیپور",
+    description:
+      "مجموعه‌ای از پروژه‌های واقعی با تمرکز بر معماری تمیز، UI مدرن، تجربه کاربری روان و توسعه فول‌استک با Next.js.",
+    url: "https://manialipour.ir/projects",
+    siteName: "مانی علیپور",
+    locale: "fa_IR",
+    type: "website",
+    images: [
+      {
+        url: "https://manialipour.ir/images/og/projects-og.jpg",
+        width: 1200,
+        height: 630,
+        alt: "نمونه‌کارها و پروژه‌های مانی علیپور",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "نمونه‌کارها و پروژه‌های طراحی سایت | مانی علیپور",
+    description:
+      "مشاهده پروژه‌های طراحی سایت، توسعه فول‌استک، Next.js، پنل ادمین و رابط کاربری مدرن توسط مانی علیپور.",
+    images: ["https://manialipour.ir/images/og/projects-og.jpg"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 export type PageProps = {
   searchParams: Promise<{
@@ -16,8 +72,6 @@ export type PageProps = {
 export default async function ProjectsPage({ searchParams }: PageProps) {
   const { q = "", status = "" } = await searchParams;
   const projects = await fetchPublishedProjects({ q, status, limit: 100 });
-
-  console.log(projects);
 
   const hasFilters = Boolean(q || status);
   const featured =

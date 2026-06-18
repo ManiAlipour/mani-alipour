@@ -47,6 +47,7 @@ export default function ProjectCard({
           <Image
             src={project.coverImage}
             alt={project.title}
+            title={`تصویر پروژه: ${project.title}`}
             fill
             sizes={
               featured

@@ -1,7 +1,6 @@
 import { getBlog } from "@/utils/api/blog/get-blog";
 import { fetchPublishedBlogs } from "@/lib/data/blogs";
 import ReadingProgress from "@/components/sections/blogs/ReadingProgress";
-import RelatedBlogs from "@/components/sections/blogs/RelatedBlogs";
 import ShareBlogButton from "@/components/sections/blogs/ShareBlogButton";
 import Link from "next/link";
 import Image from "next/image";
@@ -17,29 +16,69 @@ import { MdOutlineDateRange } from "react-icons/md";
 import { notFound } from "next/navigation";
 import { getView, setView } from "@/utils/api/blog/set-view";
 import { PiCoffeeFill } from "react-icons/pi";
+import dynamic from "next/dynamic";
+
+const RelatedBlogs = dynamic(
+  () => import("@/components/sections/blogs/RelatedBlogs"),
+  {
+    ssr: true,
+    loading: () => (
+      <div className="h-48 animate-pulse rounded-2xl bg-white/5" />
+    ),
+  },
+);
 
 interface IBlogPage {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: IBlogPage) {
-  const { slug } = await params;
-  const blog = await getBlog(slug);
+import { Metadata } from "next";
+import ViewCounter from "@/components/providers/ViewConuter";
 
-  if (!blog) {
-    return {
-      title: "مقاله یافت نشد",
-      description: "مقاله موردنظر پیدا نشد.",
-    };
-  }
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getBlog(slug);
+
+  if (!post) return {};
 
   return {
-    title: blog.title,
-    description: blog.excerpt,
+    title: `${post.title}`,
+
+    description: post.excerpt,
+
+    keywords: post.tags.map((t) => t.name),
+
+    alternates: {
+      canonical: `https://manialipour.ir/blogs/${post.slug}`,
+    },
+
     openGraph: {
-      title: blog.title,
-      description: blog.excerpt,
-      images: blog.cover ? [{ url: blog.cover }] : [],
+      title: post.title,
+      description: post.excerpt,
+      url: `https://manialipour.ir/blogs/${post.slug}`,
+      type: "article",
+      images: [
+        {
+          url: post.cover,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      publishedTime: post.createdAt ?? undefined,
+      modifiedTime: post.updatedAt ?? undefined,
+    },
+    authors: [{ name: "مانی علیپور", url: "https://manialipour.ir" }],
+
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [post.cover],
     },
   };
 }
@@ -50,14 +89,42 @@ export default async function BlogPage({ params }: IBlogPage) {
 
   if (!blog) notFound();
 
-  await setView(blog._id);
-  const views = await getView(blog._id);
-
-  const allBlogs = await fetchPublishedBlogs({ limit: 6 });
+  const [views, allBlogs] = await Promise.all([
+    getView(blog._id),
+    fetchPublishedBlogs({ limit: 6 }),
+  ]);
   const related = allBlogs.filter((item) => item.slug !== slug).slice(0, 3);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: blog.title,
+    description: blog.excerpt,
+    image: blog.cover,
+    author: {
+      "@type": "Person",
+      name: "مانی علیپور",
+      url: "https://manialipour.ir",
+    },
+    datePublished: blog.createdAt,
+    dateModified: blog.updatedAt,
+    publisher: {
+      "@type": "Organization",
+      name: "وبلاگ مانی علیپور",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://manialipour.ir/mani-alipour-logo.ico",
+      },
+    },
+  };
 
   return (
     <>
+      <ViewCounter blogId={blog._id} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ReadingProgress />
 
       <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.10),transparent_32rem),linear-gradient(135deg,#0d1117,#111b2a_45%,#172236)] pb-20 selection:bg-cyan-500/30 md:pb-28">
@@ -84,9 +151,9 @@ export default async function BlogPage({ params }: IBlogPage) {
             {blog.cover && (
               <div className="relative mb-8 aspect-[16/9] overflow-hidden rounded-2xl border border-cyan-700/25 bg-cyan-950/20 shadow-[0_18px_60px_rgba(0,0,0,0.35)] sm:rounded-3xl md:mb-10 md:aspect-[21/9]">
                 <Image
-                  unoptimized
                   src={blog.cover}
                   alt={blog.title}
+                  title={`تصویر مقاله: ${blog.title}`}
                   fill
                   priority
                   className="object-cover object-center transition-transform duration-700 hover:scale-105"
@@ -96,7 +163,7 @@ export default async function BlogPage({ params }: IBlogPage) {
               </div>
             )}
 
-            {/* Blog Title & Meta */}
+            {/* Blog Title */}
             <header
               className="mb-8 flex w-full flex-col gap-4 md:mb-10"
               dir="rtl"

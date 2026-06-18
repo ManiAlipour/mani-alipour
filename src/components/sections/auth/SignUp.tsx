@@ -26,7 +26,7 @@ const userFields = [
     name: "password",
     label: "رمز عبور",
     type: "password",
-    placeholder: "حداقل ۶ کاراکتر",
+    placeholder: "حداقل 8 کاراکتر",
     autoComplete: "new-password",
     showToggler: true,
   },

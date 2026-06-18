@@ -34,6 +34,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
             unoptimized
             src={blog.cover}
             alt={blog.title}
+            title={`تصویر مقاله: ${blog.title}`}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
             className="object-cover transition-transform duration-700 group-hover:scale-110"

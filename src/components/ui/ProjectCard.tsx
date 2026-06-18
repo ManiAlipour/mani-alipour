@@ -10,6 +10,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           <img
             src={project.coverImage}
             alt={project.title}
+            title={`تصویر پروژه: ${project.title}`}
             loading="lazy"
             className="object-cover w-full h-full scale-105 group-hover:scale-110 transition-transform duration-500"
             style={{
@@ -55,6 +56,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                   key={img}
                   src={img}
                   alt={`عکس ${j + 1} ${project.title}`}
+                  title={`عکس ${j + 1} ${project.title}`}
                   className="w-8 h-8 rounded border border-cyan-500/25 object-cover shadow-md"
                   loading="lazy"
                   width={32}

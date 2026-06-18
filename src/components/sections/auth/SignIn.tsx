@@ -89,7 +89,6 @@ function AuthBackgroundDecor() {
           />
         </svg>
       </div>
-      {/* Neon blurry glow bottom right */}
       <div
         className="absolute z-0 select-none"
         style={{
@@ -284,7 +283,7 @@ export default function SignIn() {
                     name="password"
                     type={showPassword ? "text" : "password"}
                     className="w-full font-shabnam rounded-xl border border-cyan-800 bg-cyan-900/30 text-cyan-100 placeholder-cyan-200/50 shadow-sm px-3 py-3 focus:border-neon-blue focus:ring-2 focus:ring-cyan-600/40 transition text-base outline-none disabled:bg-cyan-950/30"
-                    placeholder="حداقل ۶ کاراکتر"
+                    placeholder="حداقل 8 کاراکتر"
                     autoComplete="current-password"
                   />
                   <button

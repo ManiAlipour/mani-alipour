@@ -5,7 +5,10 @@ import {
   PROJECT_STATUS_LABELS,
   PROJECT_STATUS_STYLES,
 } from "@/lib/project-status";
-import { fetchProjectBySlug, fetchPublishedProjects } from "@/lib/data/projects";
+import {
+  fetchProjectBySlug,
+  fetchPublishedProjects,
+} from "@/lib/data/projects";
 import ProjectCard from "@/components/sections/projects/ProjectCard";
 import { FaArrowRight } from "react-icons/fa";
 import { FiExternalLink, FiGithub } from "react-icons/fi";
@@ -38,9 +41,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   if (!project) notFound();
 
   const allProjects = await fetchPublishedProjects({ limit: 6 });
-  const related = allProjects
-    .filter((item) => item.slug !== slug)
-    .slice(0, 3);
+  const related = allProjects.filter((item) => item.slug !== slug).slice(0, 3);
 
   const isHtml = /<[a-z][\s\S]*>/i.test(project.description);
 
@@ -133,6 +134,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <Image
               src={project.coverImage}
               alt={project.title}
+              title={`تصویر پروژه: ${project.title}`}
               fill
               priority
               className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -143,7 +145,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         ) : null}
 
         <section className="rounded-3xl border border-white/10 bg-[#111b2e]/60 p-6 sm:p-8">
-          <h2 className="mb-5 text-2xl font-black text-cyan-50">درباره پروژه</h2>
+          <h2 className="mb-5 text-2xl font-black text-cyan-50">
+            درباره پروژه
+          </h2>
           {isHtml ? (
             <div
               className="prose prose-invert max-w-none leading-8 text-slate-300 prose-a:text-cyan-400"
@@ -159,7 +163,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
         {project.gallery?.length ? (
           <section className="mt-10">
-            <h2 className="mb-5 text-2xl font-black text-cyan-50">گالری تصاویر</h2>
+            <h2 className="mb-5 text-2xl font-black text-cyan-50">
+              گالری تصاویر
+            </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {project.gallery.map((image, index) => (
                 <div

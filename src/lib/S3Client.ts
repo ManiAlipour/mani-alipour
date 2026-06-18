@@ -21,14 +21,17 @@ if (!secretAccessKey) {
 export const s3Client = new S3Client({
   region: "default",
   endpoint,
+  forcePathStyle: true,
+  maxAttempts: 1,
   credentials: {
     accessKeyId,
     secretAccessKey,
   },
   requestHandler: new NodeHttpHandler({
+    connectionTimeout: 10_000,
+    socketTimeout: 30_000,
     httpsAgent: new https.Agent({
-      rejectUnauthorized: false,
+      keepAlive: true,
     }),
   }),
-  forcePathStyle: true,
 });

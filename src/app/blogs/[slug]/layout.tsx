@@ -1,5 +1,6 @@
 "use client";
 
+import Script from "next/script";
 import "./style.css";
 import { useEffect } from "react";
 
@@ -81,5 +82,10 @@ export default function BlogLayout({
   children: React.ReactNode;
 }) {
   usePrismRtlEnhancements();
-  return <div className="font-vazir">{children}</div>;
+  return (
+    <>
+      <Script src="https://manialipour.ir/script.js" strategy="lazyOnload" />
+      <div className="font-vazir">{children}</div>
+    </>
+  );
 }

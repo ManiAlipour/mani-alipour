@@ -7,6 +7,27 @@ import BlogCard from "@/components/ui/BlogCard";
 import { getBlogs } from "@/utils/api/blog/get-blogs";
 import { getTags } from "@/utils/api/get-tags";
 import { LuBookText, LuFileText, LuTags, LuSparkles } from "react-icons/lu";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "آموزش و مقالات تخصصی برنامه نویسی وب | مانی علیپور",
+  description:
+    "مقالات تخصصی برنامه نویسی و توسعه وب توسط مانی علیپور. آموزش ها، تجربیات فنی و راهکارهای عملی در توسعه مدرن وب و معماری نرم افزار.",
+
+  alternates: {
+    canonical: "https://manialipour.ir/blogs",
+  },
+
+  openGraph: {
+    title: "آموزش و مقالات تخصصی برنامه نویسی وب | مانی علیپور",
+    description:
+      "مقالات تخصصی برنامه نویسی و توسعه وب، آموزش ها و تجربیات فنی در حوزه فناوری های مدرن وب.",
+    url: "https://manialipour.ir/blogs",
+    siteName: "Mani Alipour",
+    locale: "fa_IR",
+    type: "website",
+  },
+};
 
 export type PageProps = {
   searchParams: Promise<{

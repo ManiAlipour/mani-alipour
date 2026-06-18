@@ -3,6 +3,9 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 import { s3Client } from "@/lib/S3Client";
 
+export const runtime = "nodejs";
+export const preferredRegion = "fra1";
+
 const BUCKET = process.env.S3_BUCKET_NAME;
 const PUBLIC_PATH = "/storage";
 

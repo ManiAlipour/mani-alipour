@@ -19,6 +19,7 @@ import { BsImage } from "react-icons/bs";
 import { twMerge } from "tailwind-merge";
 import toast from "react-hot-toast";
 import FancyInputBox from "./Input";
+import { UploadButton } from "@/utils/uploadthing";
 
 const validationSchema = yup.object({
   title: yup.string().required("عنوان الزامی است"),
@@ -206,11 +207,30 @@ export default function EditBlogForm({
                       ? "تغییر تصویر کاور"
                       : "انتخاب فایل تصویر..."}
                   </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleUpload}
-                    className="hidden"
+                  <UploadButton
+                    endpoint="imageUploader"
+                    onUploadBegin={() => {
+                      setIsUploading(true);
+                      toast.loading("در حال آپلود...", { id: "upload" });
+                    }}
+                    onClientUploadComplete={(res: any) => {
+                      const url = res?.[0]?.url;
+
+                      if (url) {
+                        formik.setFieldValue("cover", url);
+                        toast.success("آپلود با موفقیت انجام شد ✅", {
+                          id: "upload",
+                        });
+                      }
+
+                      setIsUploading(false);
+                    }}
+                    onUploadError={(error: Error) => {
+                      toast.error(`خطا در آپلود: ${error.message}`, {
+                        id: "upload",
+                      });
+                      setIsUploading(false);
+                    }}
                   />
                 </label>
               )}

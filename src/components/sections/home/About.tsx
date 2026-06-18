@@ -77,28 +77,39 @@ export default function AboutSection() {
               <span>نگاه من به برنامه‌نویسی</span>
             </h3>
             <p className="break-words sm:whitespace-normal">
-              برای من برنامه‌نویسی فقط یه مهارت شغلی نیست؛ بیشتر راهیه برای خلق ایده‌هایی که به کار واقعی و زندگی روزمره آدم‌ها کمک کنه. سعی می‌کنم همیشه خروجی کارم ساده، راحت و قابل اطمینان باشه تا هرکسی با خیال راحت ازش استفاده کنه.
+              برای من برنامه‌نویسی فقط یه مهارت شغلی نیست؛ بیشتر راهیه برای خلق
+              ایده‌هایی که به کار واقعی و زندگی روزمره آدم‌ها کمک کنه. سعی
+              می‌کنم همیشه خروجی کارم ساده، راحت و قابل اطمینان باشه تا هرکسی با
+              خیال راحت ازش استفاده کنه.
             </p>
             <p className="break-words sm:whitespace-normal">
-              من همیشه تلاش کردم توی پروژه‌ها تعادل خوبی بین طراحی جذاب و کارایی عالی داشته باشم. رعایت استانداردها، توجه به جزئیات و نگاه کلی به پروژه برام خیلی مهمه و باعث شده به نتیجه‌هایی برسم که بهشون افتخار می‌کنم. حقیقتاً فکر می‌کنم ترکیب یادگیری، علاقه و تعهد رمز ساختن بهترین محصولاته.
+              من همیشه تلاش کردم توی پروژه‌ها تعادل خوبی بین طراحی جذاب و کارایی
+              عالی داشته باشم. رعایت استانداردها، توجه به جزئیات و نگاه کلی به
+              پروژه برام خیلی مهمه و باعث شده به نتیجه‌هایی برسم که بهشون افتخار
+              می‌کنم. حقیقتاً فکر می‌کنم ترکیب یادگیری، علاقه و تعهد رمز ساختن
+              بهترین محصولاته.
             </p>
             <ul className="space-y-4 sm:space-y-5 pr-2 sm:pr-4 border-s-2 sm:border-s-4 border-cyan-500/40 text-sm sm:text-base mt-4 sm:mt-5">
               <li>
                 <span className="font-bold text-cyan-300">توسعه فول‌استک:</span>
                 <span>
                   {" "}
-                  از شروع کار با یه ایده خام تا اجرا و پشتیبانی واقعی پیش رفتم و همیشه سعی کردم توی همه بخش‌ها حضور فعال و مؤثری داشته باشم.
+                  از شروع کار با یه ایده خام تا اجرا و پشتیبانی واقعی پیش رفتم و
+                  همیشه سعی کردم توی همه بخش‌ها حضور فعال و مؤثری داشته باشم.
                 </span>
               </li>
               <li>
                 <span className="font-bold text-indigo-300">
                   تمرکز روی تجربه کاربری
                 </span>
-                : برام مهمه که هر کسی بتونه راحت و بدون دردسر از محصول استفاده کنه؛ ظاهر سایت یا اپ جذاب باشه ولی کاربردیش رو هیچ‌وقت فدای زیبایی نمی‌کنم.
+                : برام مهمه که هر کسی بتونه راحت و بدون دردسر از محصول استفاده
+                کنه؛ ظاهر سایت یا اپ جذاب باشه ولی کاربردیش رو هیچ‌وقت فدای
+                زیبایی نمی‌کنم.
               </li>
               <li>
                 <span className="font-bold text-teal-200">یادگیری مداوم</span>:
-                دنیای برنامه‌نویسی خیلی سریع عوض میشه و من هم تلاش می‌کنم هر روز چیزی جدید یاد بگیرم تا بتونم همیشه با تکنولوژی‌های روز جلو برم.
+                دنیای برنامه‌نویسی خیلی سریع عوض میشه و من هم تلاش می‌کنم هر روز
+                چیزی جدید یاد بگیرم تا بتونم همیشه با تکنولوژی‌های روز جلو برم.
               </li>
             </ul>
           </div>
@@ -110,8 +121,9 @@ export default function AboutSection() {
                 <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-cyan-700 bg-gradient-to-br from-cyan-500/30 to-indigo-500/30 p-1 shadow-2xl overflow-hidden group-hover:-rotate-2 transition-all duration-300 flex-shrink-0">
                   <img
                     src="/images/profile.png"
-                    alt="Ali Manialipour"
+                    alt="Mani Alipour"
                     loading="lazy"
+                    title="مانی علیپور - توسعه فول استک"
                     className="w-full h-full object-cover rounded-full"
                     style={{ objectPosition: "center 22%" }}
                   />
@@ -124,14 +136,15 @@ export default function AboutSection() {
                 <h2 className="text-white text-[1.25rem] sm:text-2xl font-extrabold mb-1 drop-shadow-cyan text-center md:text-right w-full">
                   مانی علیپور
                 </h2>
-                <span className="inline-block bg-cyan-600/20 border border-cyan-400/30 rounded-xl 
-                px-2.5 sm:px-3 py-1 text-cyan-200 text-xs shadow text-center md:text-right">
+                <span
+                  className="inline-block bg-cyan-600/20 border border-cyan-400/30 rounded-xl 
+                px-2.5 sm:px-3 py-1 text-cyan-200 text-xs shadow text-center md:text-right"
+                >
                   عاشق یادگیری و ساختن چیزهای جدید!
                 </span>
               </div>
             </div>
           </div>
-    
         </div>
 
         {/* Tech stack showcase */}
