@@ -23,7 +23,6 @@ type Props = {
 };
 
 export default function CommentList({ comments }: Props) {
-  // رنگ‌های اختصاصی مانی
   const neonBlue = "oklch(68.5% 0.169 237.323)";
   const neonGreen = "oklch(70.4% 0.14 182.503)";
 
@@ -39,7 +38,6 @@ export default function CommentList({ comments }: Props) {
 
   return (
     <div className="mt-16 space-y-10">
-      {/* هدر بخش کامنت‌ها */}
       <div className="flex items-center gap-4 px-2">
         <h3 className="text-xl font-black text-white">نظرات کاربران</h3>
         <div className="flex h-6 items-center rounded-full bg-white/5 px-3 text-[12px] font-bold text-white/60">
@@ -58,10 +56,8 @@ export default function CommentList({ comments }: Props) {
             transition={{ delay: index * 0.05 }}
             className="group relative flex gap-5"
           >
-            {/* لاین عمودی دکوری کنار آواتار */}
             <div className="absolute right-6 top-14 bottom-[-40px] w-[1px] bg-gradient-to-b from-white/10 to-transparent group-last:hidden" />
 
-            {/* بخش آواتار با استایل نئونی برای ادمین */}
             <div className="relative shrink-0">
               <div
                 className="h-12 w-12 overflow-hidden rounded-2xl border bg-[#0d1117] transition-all duration-500 group-hover:scale-105"
@@ -91,7 +87,6 @@ export default function CommentList({ comments }: Props) {
               )}
             </div>
 
-            {/* محتوای کامنت */}
             <div className="flex-1 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -119,18 +114,16 @@ export default function CommentList({ comments }: Props) {
                 </button>
               </div>
 
-              {/* باکس متن کامنت */}
               <div className="relative rounded-2xl rounded-tr-none border border-white/5 bg-white/[0.02] p-5 text-[14px] leading-8 text-gray-400 transition-all group-hover:bg-white/[0.03] group-hover:text-gray-300">
                 {item.content}
 
-                {/* دکمه پاسخ (فقط بصری) */}
-                <button
+                {/* <button
                   className="absolute -bottom-3 left-6 flex items-center gap-2 rounded-full border border-white/10 bg-[#0a0a0a] px-4 py-1 text-[11px] font-bold opacity-0 transition-all group-hover:bottom-2 group-hover:opacity-100"
                   style={{ color: neonBlue }}
                 >
                   <HiOutlineChatBubbleLeft size={14} />
                   پاسخ به این دیدگاه
-                </button>
+                </button> */}
               </div>
             </div>
           </motion.div>
