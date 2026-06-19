@@ -34,6 +34,7 @@ interface IBlogPage {
 
 import { Metadata } from "next";
 import ViewCounter from "@/components/providers/ViewConuter";
+import CommentsSection from "@/components/sections/blogs/comments";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -288,6 +289,8 @@ export default async function BlogPage({ params }: IBlogPage) {
               </div>
             </footer>
           </div>
+
+          <CommentsSection postId={blog._id} slug={blog.slug} />
 
           {/* Related Blogs */}
           <aside className="mx-auto mt-14 w-full max-w-5xl md:mt-16">

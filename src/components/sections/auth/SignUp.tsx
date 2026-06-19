@@ -6,6 +6,7 @@ import * as yup from "yup";
 import Link from "next/link";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 const userFields = [
   {
@@ -218,6 +219,8 @@ const SignUpSchema = yup.object().shape({
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
 
   // مقدار اولیه براساس مدل User
   const initialValues = {
@@ -279,9 +282,13 @@ export default function SignUp() {
 
               if (res.ok) {
                 resetForm();
-                router.replace(
-                  `/auth/verify?email=${encodeURIComponent(values.email)}`,
-                );
+                const verifyUrl = `/auth/verify?email=${encodeURIComponent(values.email)}${
+                  callbackUrl
+                    ? `&callbackUrl=${encodeURIComponent(callbackUrl)}`
+                    : ""
+                }`;
+
+                router.replace(verifyUrl);
               } else {
                 if (body?.message) {
                   setErrors({ email: body.message });

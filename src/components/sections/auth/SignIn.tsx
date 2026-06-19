@@ -5,13 +5,11 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as yup from "yup";
 import Link from "next/link";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function AuthBackgroundDecor() {
   return (
     <>
-      {/* ...Background SVGs exactly as before... */}
-      {/* Subtle grid */}
       <svg
         aria-hidden
         className="pointer-events-none absolute inset-0 w-full h-full z-0 hidden md:block"
@@ -45,7 +43,6 @@ function AuthBackgroundDecor() {
               opacity={i % 3 ? 0.11 : 0.18}
             />
           ))}
-          {/* Random shapes */}
           <circle cx="670" cy="110" r="34" fill="#67e8f9" opacity="0.08" />
           <rect
             x="80"
@@ -58,7 +55,7 @@ function AuthBackgroundDecor() {
           />
         </g>
       </svg>
-      {/* Neon blurry glow top left */}
+
       <div
         className="absolute z-0 select-none"
         style={{
@@ -80,15 +77,10 @@ function AuthBackgroundDecor() {
               <stop offset="100%" stopColor="#0e7490" stopOpacity="0.03" />
             </radialGradient>
           </defs>
-          <circle
-            cx="80"
-            cy="80"
-            r="70"
-            fill="url(#radialGlow1)"
-            opacity="0.84"
-          />
+          <circle cx="80" cy="80" r="70" fill="url(#radialGlow1)" />
         </svg>
       </div>
+
       <div
         className="absolute z-0 select-none"
         style={{
@@ -109,58 +101,9 @@ function AuthBackgroundDecor() {
               <stop offset="100%" stopColor="#5eead4" stopOpacity="0.07" />
             </radialGradient>
           </defs>
-          <ellipse
-            cx="78"
-            cy="68"
-            rx="62"
-            ry="38"
-            fill="url(#radialGlow2)"
-            opacity="0.85"
-          />
+          <ellipse cx="78" cy="68" rx="62" ry="38" fill="url(#radialGlow2)" />
         </svg>
       </div>
-
-      {/* Mobile grid */}
-      <svg
-        aria-hidden
-        className="pointer-events-none absolute inset-0 w-full h-full z-0 block md:hidden"
-        viewBox="0 0 400 650"
-        fill="none"
-        style={{ opacity: 0.1 }}
-        preserveAspectRatio="none"
-      >
-        <g>
-          <line
-            x1="70"
-            y1="10"
-            x2="85"
-            y2="660"
-            stroke="#38bdf8"
-            strokeWidth="0.5"
-            opacity="0.13"
-          />
-          <line
-            x1="240"
-            y1="0"
-            x2="400"
-            y2="590"
-            stroke="#5fe2d0"
-            strokeWidth="0.5"
-            opacity="0.09"
-          />
-          <rect
-            x="320"
-            y="510"
-            width="17"
-            height="17"
-            rx="4"
-            fill="#a5b4fc"
-            opacity=".07"
-          />
-          <circle cx="120" cy="300" r="11" fill="#38bdf8" opacity="0.10" />
-          <circle cx="70" cy="480" r="6" fill="#a5f3fc" opacity="0.12" />
-        </g>
-      </svg>
     </>
   );
 }
@@ -182,6 +125,9 @@ export default function SignIn() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const handleLogin = async (
     values: { email: string; password: string },
@@ -204,8 +150,17 @@ export default function SignIn() {
 
       if (res.ok) {
         setSuccess(data.message || "ورود با موفقیت انجام شد!");
+
         const role = data.user?.role;
-        router.replace(role === "admin" ? "/admin" : "/dashboard");
+
+        const redirectUrl =
+          callbackUrl && callbackUrl.startsWith("/")
+            ? callbackUrl
+            : role === "admin"
+              ? "/admin"
+              : "/";
+
+        router.replace(redirectUrl);
       } else {
         setError(
           data.message ||
@@ -216,7 +171,7 @@ export default function SignIn() {
               : "خطای ناشناخته‌ای رخ داد."),
         );
       }
-    } catch (err: any) {
+    } catch {
       setError("ارتباط با سرور برقرار نشد.");
     } finally {
       setSubmitting(false);
@@ -226,10 +181,12 @@ export default function SignIn() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen py-12 px-4 bg-gradient-to-br from-cyan-950 via-slate-900 to-cyan-950 overflow-hidden">
       <AuthBackgroundDecor />
+
       <div className="relative z-10 w-full max-w-sm bg-gradient-to-b from-cyan-900/80 to-cyan-950/90 rounded-3xl shadow-lg px-6 pt-10 pb-8 backdrop-blur-lg border border-cyan-900/30">
-        <h2 className="mb-7 text-center text-2xl font-yekan font-extrabold bg-gradient-to-l from-neon-blue via-cyan-100 to-neon-green bg-clip-text text-transparent drop-shadow-[0_1px_6px_rgba(37,255,83,0.2)]">
+        <h2 className="mb-7 text-center text-2xl font-yekan font-extrabold bg-gradient-to-l from-neon-blue via-cyan-100 to-neon-green bg-clip-text text-transparent">
           ورود به حساب
         </h2>
+
         <Formik
           initialValues={{ email: "", password: "" }}
           validationSchema={SignInSchema}
@@ -238,62 +195,53 @@ export default function SignIn() {
           {({ isSubmitting }) => (
             <Form className="flex flex-col gap-6">
               {error && (
-                <div className="w-full text-xs font-bold font-shabnam text-red-400 bg-red-900/20 py-2 px-3 mb-1.5 rounded shadow shadow-red-900/15 text-center">
+                <div className="text-xs text-red-400 bg-red-900/20 py-2 px-3 rounded text-center">
                   {error}
                 </div>
               )}
+
               {success && (
-                <div className="w-full text-xs font-bold font-shabnam text-neon-green bg-green-900/20 py-2 px-3 mb-1.5 rounded shadow shadow-green-900/15 text-center">
+                <div className="text-xs text-neon-green bg-green-900/20 py-2 px-3 rounded text-center">
                   {success}
                 </div>
               )}
+
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-yekan font-bold text-cyan-200 mb-2 pr-1"
-                >
+                <label className="block text-sm font-bold text-cyan-200 mb-2">
                   ایمیل
                 </label>
-                <div className="relative">
-                  <Field
-                    id="email"
-                    name="email"
-                    type="email"
-                    className="w-full font-shabnam rounded-xl border border-cyan-800 bg-cyan-900/30 text-cyan-100 placeholder-cyan-200/50 shadow-sm px-3 py-3 focus:border-neon-blue focus:ring-2 focus:ring-cyan-600/40 transition text-base outline-none disabled:bg-cyan-950/30"
-                    placeholder="you@example.com"
-                    autoComplete="email"
-                  />
-                </div>
+
+                <Field
+                  name="email"
+                  type="email"
+                  className="w-full rounded-xl border border-cyan-800 bg-cyan-900/30 text-cyan-100 px-3 py-3 focus:border-neon-blue focus:ring-2 focus:ring-cyan-600/40 outline-none"
+                  placeholder="you@example.com"
+                />
+
                 <ErrorMessage
                   name="email"
                   component="div"
-                  className="text-xs text-neon-green font-bold pr-1 mt-1"
+                  className="text-xs text-neon-green mt-1"
                 />
               </div>
+
               <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-yekan font-bold text-cyan-200 mb-2 pr-1"
-                >
+                <label className="block text-sm font-bold text-cyan-200 mb-2">
                   رمز عبور
                 </label>
+
                 <div className="relative">
                   <Field
-                    id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    className="w-full font-shabnam rounded-xl border border-cyan-800 bg-cyan-900/30 text-cyan-100 placeholder-cyan-200/50 shadow-sm px-3 py-3 focus:border-neon-blue focus:ring-2 focus:ring-cyan-600/40 transition text-base outline-none disabled:bg-cyan-950/30"
+                    className="w-full rounded-xl border border-cyan-800 bg-cyan-900/30 text-cyan-100 px-3 py-3 outline-none"
                     placeholder="حداقل 8 کاراکتر"
-                    autoComplete="current-password"
                   />
+
                   <button
                     type="button"
-                    tabIndex={-1}
-                    aria-label={
-                      showPassword ? "مخفی کردن رمز عبور" : "نمایش رمز عبور"
-                    }
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-cyan-300 hover:text-neon-green/80 transition"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-300"
                   >
                     {showPassword ? (
                       <FiEyeOff size={20} />
@@ -302,35 +250,29 @@ export default function SignIn() {
                     )}
                   </button>
                 </div>
+
                 <ErrorMessage
                   name="password"
                   component="div"
-                  className="text-xs text-neon-green font-bold pr-1 mt-1"
+                  className="text-xs text-neon-green mt-1"
                 />
               </div>
+
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex justify-center font-extrabold py-3 px-4 rounded-xl bg-gradient-to-r from-neon-blue via-cyan-500/80 to-neon-green text-slate-950 shadow-[0_2px_18px_0_rgba(37,255,83,0.13)] hover:bg-cyan-300/90 transition-colors text-lg tracking-wide outline-none disabled:opacity-55 focus:ring focus:ring-neon-green/30"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-neon-blue to-neon-green text-slate-950 font-bold"
               >
                 {isSubmitting ? "در حال ورود..." : "ورود"}
               </button>
-              <div className="flex flex-col items-center gap-2 mt-2">
-                <div className="text-sm font-shabnam text-cyan-200 mt-2 select-none">
-                  حساب کاربری ندارید؟{" "}
-                  <Link
-                    href="/auth/signup"
-                    className="font-yekan font-bold text-neon-green hover:underline underline-offset-2 transition-colors"
-                  >
-                    ساخت حساب کاربری
-                  </Link>
-                </div>
+
+              <div className="text-center text-sm text-cyan-200">
+                حساب ندارید؟{" "}
                 <Link
-                  href="/"
-                  className="inline-block text-cyan-300 font-yekan text-sm font-bold px-2 py-1.5 mt-2 hover:text-neon-green/90 transition-colors underline"
-                  tabIndex={isSubmitting ? -1 : 0}
+                  href={`/auth/signup${callbackUrl ? `?callbackUrl=${callbackUrl}` : ""}`}
+                  className="text-neon-green font-bold"
                 >
-                  بازگشت به صفحه اصلی
+                  ثبت نام
                 </Link>
               </div>
             </Form>
