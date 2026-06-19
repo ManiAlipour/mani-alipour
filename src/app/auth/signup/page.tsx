@@ -1,5 +1,6 @@
 import SignUp from "@/components/sections/auth/SignUp";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   robots: {
@@ -15,5 +16,9 @@ export const metadata: Metadata = {
 };
 
 export default function SingUpPage() {
-  return <SignUp />;
+  return (
+    <Suspense fallback={null}>
+      <SignUp />
+    </Suspense>
+  );
 }
