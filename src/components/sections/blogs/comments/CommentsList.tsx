@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { HiOutlineClock, HiOutlineChatBubbleLeft } from "react-icons/hi2";
 import { IoHeartOutline } from "react-icons/io5";
 
-// مانی جان، این تایپ دقیقاً مطابق با دیتایی هست که از روت GET جدید می‌گیری
 interface IComment {
   _id: string;
   postId: string;

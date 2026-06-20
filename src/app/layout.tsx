@@ -52,16 +52,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl" suppressHydrationWarning>
+    <html
+      lang="fa"
+      dir="rtl"
+      suppressHydrationWarning
+      className="scroll-smooth"
+    >
       <body
         className="bg-gradient-to-br from-cyan-950 via-slate-900 to-cyan-950 text-white font-yekan"
         style={{
           minHeight: "100dvh",
         }}
       >
-        <NextSSRPlugin
-          routerConfig={extractRouterConfig(ourFileRouter)}
-        />
+        <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         <MainLayout>{children}</MainLayout>
       </body>
     </html>

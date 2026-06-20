@@ -1,4 +1,4 @@
-/** @type {import('next-sitemap').IConfig} */
+const mongoose = require("mongoose");
 
 module.exports = {
   siteUrl: "https://manialipour.ir",
@@ -16,24 +16,34 @@ module.exports = {
     "/api/*",
   ],
 
-  transform: async (config, path) => {
-    return {
-      loc: path,
-      changefreq: path === "/" ? "daily" : "weekly",
-      priority:
-        path === "/"
-          ? 1
-          : path === "/blogs" || path === "/projects"
-            ? 0.9
-            : 0.7,
-      lastmod: new Date().toISOString(),
-    };
-  },
+  transform: async (config, path) => ({
+    loc: path,
+    changefreq: path === "/" ? "daily" : "weekly",
+    priority:
+      path === "/" ? 1 : path === "/blogs" || path === "/projects" ? 0.9 : 0.7,
+    lastmod: new Date().toISOString(),
+  }),
 
   additionalPaths: async (config) => {
-    const paths = ["/blogs", "/projects", "/about"];
+    const result = [];
 
-    return Promise.all(paths.map((path) => config.transform(config, path)));
+    const staticPages = ["/blogs", "/projects", "/about"];
+
+    for (const path of staticPages) {
+      result.push(await config.transform(config, path));
+    }
+
+    const res = await fetch("https://manialipour.ir/api/blogs/sitemap");
+    const blogs = await res.json();
+
+    const blogPaths = blogs.map((blog) => ({
+      loc: `/blogs/${blog.slug}`,
+      changefreq: "weekly",
+      priority: 0.8,
+      lastmod: blog.updatedAt,
+    }));
+
+    return [...result, ...blogPaths];
   },
 
   robotsTxtOptions: {

@@ -42,7 +42,12 @@ html {
   html {
     color-scheme: dark !important;
     forced-color-adjust: none !important;
+    scroll-behavior: smooth;
   }
+}
+
+[id] {
+  scroll-margin-top: 100px; /* این مقدار را متناسب با ارتفاع هدرت تنظیم کن */
 }
 
 @keyframes sparkle {
