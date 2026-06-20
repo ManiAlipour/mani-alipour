@@ -170,7 +170,9 @@ export default async function BlogPage({ params }: IBlogPage) {
                   </div>
                   <div className="flex items-center gap-2 border-l border-white/10 pl-6">
                     <MdOutlineDateRange className="text-slate-500" />
-                    {new Date(blog.createdAt).toLocaleDateString("fa-IR")}
+                    {blog.createdAt
+                      ? new Date(blog.createdAt).toLocaleDateString("fa-IR")
+                      : "—"}
                   </div>
                   <div className="flex items-center gap-2">
                     <FaRegClock className="text-slate-500" />
