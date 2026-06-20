@@ -11,6 +11,7 @@ import {
   FaUser,
   FaListUl,
   FaEye,
+  FaStar,
 } from "react-icons/fa";
 import { MdOutlineDateRange } from "react-icons/md";
 import { notFound } from "next/navigation";
@@ -21,6 +22,7 @@ import { Metadata } from "next";
 import ViewCounter from "@/components/providers/ViewConuter";
 import CommentsSection from "@/components/sections/blogs/comments";
 import BlogLikeButton from "@/components/features/BlogLikeButton";
+import { PiCoffeeFill } from "react-icons/pi";
 
 const RelatedBlogs = dynamic(
   () => import("@/components/sections/blogs/RelatedBlogs"),
@@ -73,13 +75,13 @@ export default async function BlogPage({ params }: IBlogPage) {
   const { toc, updatedHtml } = generateToc(blog.content);
 
   const TocComponent = (
-    <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-7 backdrop-blur-sm">
-      <div className="flex items-center gap-3 mb-6 font-bold text-white">
+    <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-7 backdrop-blur-sm max-h-[calc(100vh-160px)] flex flex-col">
+      <div className="flex items-center gap-3 mb-6 font-bold text-white shrink-0">
         <FaListUl className="text-xs text-cyan-500" />
         <h2 className="text-base">فهرست مطالب</h2>
       </div>
 
-      <nav>
+      <nav className="pl-2 overflow-y-auto custom-scrollbar">
         <ul className="space-y-4">
           {toc.map((item) => (
             <li key={item.id}>
@@ -88,7 +90,7 @@ export default async function BlogPage({ params }: IBlogPage) {
                 className="group flex items-start gap-3 text-[13px] leading-relaxed text-slate-400 transition-all hover:text-cyan-400"
               >
                 <span className="w-1 h-1 mt-2 transition-colors rounded-full shrink-0 bg-slate-700 group-hover:bg-cyan-500" />
-                {item.text}
+                <span className="break-words">{item.text}</span>
               </a>
             </li>
           ))}
@@ -174,7 +176,6 @@ export default async function BlogPage({ params }: IBlogPage) {
 
                 {/* Metadata */}
                 <div className="grid grid-cols-2 gap-3 text-sm text-slate-400 lg:flex lg:flex-wrap lg:items-center lg:gap-6">
-                  
                   <div className="flex items-center gap-2 rounded-2xl border border-white/5 bg-white/[0.02] px-3 py-3 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
                     <div className="relative w-8 h-8 overflow-hidden border rounded-full shrink-0 border-cyan-500/30">
                       <FaUser className="absolute inset-0 m-auto text-cyan-500" />
@@ -193,16 +194,15 @@ export default async function BlogPage({ params }: IBlogPage) {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 rounded-2xl border border-white/5 bg-white/[0.02] px-3 py-3 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
+                  <div className="flex items-center gap-2 px-3 py-3 border rounded-2xl border-white/5 bg-white/2 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
                     <FaRegClock className="text-slate-500" />
                     <span>{blog.readAt || 5} دقیقه مطالعه</span>
                   </div>
 
-                  <div className="flex items-center gap-2 rounded-2xl border border-white/5 bg-white/[0.02] px-3 py-3 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
+                  <div className="flex items-center gap-2 px-3 py-3 border rounded-2xl border-white/5 bg-white/2 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
                     <FaEye className="text-slate-500" />
                     <span>{views ?? 0} بازدید</span>
                   </div>
-
                 </div>
               </header>
 
@@ -210,6 +210,28 @@ export default async function BlogPage({ params }: IBlogPage) {
                 className="prose blog-content prose-invert prose-cyan max-w-none"
                 dangerouslySetInnerHTML={{ __html: updatedHtml }}
               />
+
+              <div className="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-slate-900/95 via-amber-950/25 to-orange-950/30 p-8 text-center shadow-[0_18px_55px_rgba(0,0,0,0.28)] sm:p-10">
+                <h3 className="flex flex-col items-center justify-center gap-3 mb-4 text-xl font-black text-amber-300 drop-shadow sm:flex-row sm:text-2xl">
+                  <FaStar className="animate-bounce" />
+                  <span>این مطلب برات مفید بود؟</span>
+                </h3>
+
+                <p className="mx-auto mb-8 max-w-2xl text-[15px] leading-[1.8] text-slate-300 px-2 sm:px-0 sm:text-base sm:leading-8">
+                  با حمایتت بهم انرژی می‌دی که تولید محتوای تخصصی‌تر، رایگان و
+                  باکیفیت‌تر رو ادامه بدم.
+                </p>
+
+                <a
+                  href="https://coffeebede.ir/manialipour"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-xl bg-amber-400 px-6 py-3 text-[15px] font-black text-[#181818] shadow-xl shadow-amber-400/15 transition-all hover:scale-[1.03] hover:bg-amber-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-amber-300 sm:w-auto sm:px-7 sm:text-base"
+                >
+                  <PiCoffeeFill className="text-xl" />
+                  یه قهوه مهمونم کن
+                </a>
+              </div>
 
               <div className="mt-24">
                 <CommentsSection postId={blog._id} slug={blog.slug} />
