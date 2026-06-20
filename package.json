@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1063.0",
+    "@reduxjs/toolkit": "^2.12.0",
     "@smithy/node-http-handler": "^4.7.8",
     "@tailwindcss/typography": "^0.5.19",
     "@tiptap/extension-code-block-lowlight": "^3.23.4",
@@ -44,6 +45,9 @@
     "react-dom": "19.2.4",
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.6.0",
+    "react-redux": "^9.3.0",
+    "redux": "^5.0.1",
+    "redux-persist": "^6.0.0",
     "tailwind-merge": "^3.6.0",
     "tocbot": "^4.36.8",
     "uploadthing": "^7.7.4",

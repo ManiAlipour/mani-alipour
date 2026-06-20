@@ -1,102 +1,211 @@
 import { NextRequest, NextResponse } from "next/server";
-import Like from "@/models/Like";
-import Blog from "@/models/Blog";
-import { connectDB } from "@/lib/mongodb";
-import { verifyJWT } from "@/utils/jwt";
+import { randomUUID } from "crypto";
+import mongoose from "mongoose";
 
-export const GET = async (
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) => {
+import { connectDB } from "@/lib/mongodb";
+import Like from "@/models/Like";
+
+type RouteParams = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     await connectDB();
-    const { id: postId } = await params;
 
-    const blog = await Blog.findById(postId);
-    if (!blog) {
+    const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
-        { message: "پست مورد نظر یافت نشد" },
-        { status: 404 },
+        {
+          success: false,
+          message: "شناسه مقاله معتبر نیست",
+        },
+        { status: 400 },
       );
     }
+
+    const postId = new mongoose.Types.ObjectId(id);
+
+    const userId = null;
+
+    const visitorId = req.cookies.get("visitorId")?.value || null;
+
+    const identityConditions = [];
+
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+      identityConditions.push({
+        userId: new mongoose.Types.ObjectId(userId),
+      });
+    }
+
+    if (visitorId) {
+      identityConditions.push({
+        visitorId,
+      });
+    }
+
+    const liked =
+      identityConditions.length > 0
+        ? Boolean(
+            await Like.findOne({
+              postId,
+              $or: identityConditions,
+            }).lean(),
+          )
+        : false;
 
     const likeCount = await Like.countDocuments({ postId });
 
     return NextResponse.json({
-      message: "آمار لایک‌ها با موفقیت دریافت شد",
-      data: { likeCount },
+      success: true,
+      message: "وضعیت لایک دریافت شد",
+      data: {
+        liked,
+        likeCount,
+      },
     });
-  } catch (error: any) {
+  } catch (error) {
+    console.error("GET_LIKE_ERROR:", error);
+
     return NextResponse.json(
-      { message: "خطا در دریافت لایک‌ها", error: error?.message },
+      {
+        success: false,
+        message: "خطا در دریافت وضعیت لایک",
+      },
       { status: 500 },
     );
   }
-};
+}
 
-export const POST = async (
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) => {
+export async function POST(req: NextRequest, { params }: RouteParams) {
   try {
     await connectDB();
-    const { id: postId } = await params;
 
-    const blog = await Blog.findById(postId);
-    if (!blog) {
+    const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
-        { message: "پست مورد نظر یافت نشد" },
-        { status: 404 },
+        {
+          success: false,
+          message: "شناسه مقاله معتبر نیست",
+        },
+        { status: 400 },
       );
     }
 
-    const authHeader = req.headers.get("authorization");
-    let userId: string | undefined;
-    let ip: string | undefined;
+    const postId = new mongoose.Types.ObjectId(id);
 
-    if (authHeader) {
-      try {
-        const token = authHeader.replace("Bearer ", "").trim();
-        const user = await verifyJWT(token);
-        userId = user?.userId;
-      } catch (error) {
-        userId = undefined;
-      }
+    const userId = null;
+
+    let visitorId = req.cookies.get("visitorId")?.value;
+    let shouldSetVisitorCookie = false;
+
+    if (!userId && !visitorId) {
+      visitorId = randomUUID();
+      shouldSetVisitorCookie = true;
     }
 
-    ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+    const identityConditions = [];
 
-    const query: any = { postId };
-    if (userId) {
-      query.userId = userId;
-    } else if (ip) {
-      query.userId = null;
-      query.ip = ip;
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+      identityConditions.push({
+        userId: new mongoose.Types.ObjectId(userId),
+      });
     }
 
-    const existingLike = await Like.findOne(query);
+    if (visitorId) {
+      identityConditions.push({
+        visitorId,
+      });
+    }
+
+    if (identityConditions.length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "شناسه کاربر یا بازدیدکننده یافت نشد",
+        },
+        { status: 400 },
+      );
+    }
+
+    const existingLike = await Like.findOne({
+      postId,
+      $or: identityConditions,
+    });
+
+    let liked: boolean;
 
     if (existingLike) {
-      await Like.deleteOne({ _id: existingLike._id });
-      return NextResponse.json(
-        { message: "لایک شما حذف شد!", data: { liked: false } },
-        { status: 200 },
-      );
-    } else {
-      await Like.create({
-        postId,
-        userId: userId || undefined,
-        ip: userId ? undefined : ip,
+      await Like.deleteOne({
+        _id: existingLike._id,
       });
+
+      liked = false;
+    } else {
+      const createPayload: {
+        postId: mongoose.Types.ObjectId;
+        userId?: mongoose.Types.ObjectId;
+        visitorId?: string;
+      } = {
+        postId,
+      };
+
+      if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+        createPayload.userId = new mongoose.Types.ObjectId(userId);
+      } else if (visitorId) {
+        createPayload.visitorId = visitorId;
+      }
+
+      await Like.create(createPayload);
+
+      liked = true;
+    }
+
+    const likeCount = await Like.countDocuments({ postId });
+
+    const response = NextResponse.json({
+      success: true,
+      message: liked ? "مقاله لایک شد" : "لایک حذف شد",
+      data: {
+        liked,
+        likeCount,
+      },
+    });
+
+    if (shouldSetVisitorCookie && visitorId) {
+      response.cookies.set("visitorId", visitorId, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24 * 365,
+        path: "/",
+      });
+    }
+
+    return response;
+  } catch (error: any) {
+    console.error("POST_LIKE_ERROR:", error);
+
+    if (error?.code === 11000) {
       return NextResponse.json(
-        { message: "پست با موفقیت لایک شد!", data: { liked: true } },
-        { status: 201 },
+        {
+          success: false,
+          message: "این مقاله قبلاً لایک شده است",
+        },
+        { status: 409 },
       );
     }
-  } catch (error: any) {
+
     return NextResponse.json(
-      { message: "خطا در ثبت لایک", error: error?.message },
+      {
+        success: false,
+        message: "خطا در ثبت یا حذف لایک",
+      },
       { status: 500 },
     );
   }
-};
+}
