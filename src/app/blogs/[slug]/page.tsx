@@ -197,7 +197,7 @@ export default async function BlogPage({ params }: IBlogPage) {
                   <FaStar className="animate-pulse" />
                 </div>
                 <h3 className="mb-4 text-2xl font-black text-white md:text-3xl">
-                  این مقاله برات مفید بود، مانی؟
+                 این مقاله برات مفید بود؟
                 </h3>
                 <p className="mx-auto mb-10 max-w-md text-lg leading-relaxed text-slate-400">
                   اگر از مطالعه لذت بردی، با یه قهوه بهم انرژی بده تا با قدرت
