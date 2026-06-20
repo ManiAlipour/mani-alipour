@@ -192,23 +192,25 @@ export default async function BlogPage({ params }: IBlogPage) {
                 dangerouslySetInnerHTML={{ __html: updatedHtml }}
               />
 
-              <div className="mt-24 rounded-[3rem] border border-amber-500/20 bg-gradient-to-br from-amber-500/5 via-transparent to-transparent p-10 text-center md:p-16">
-                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10 text-3xl text-amber-500">
-                  <FaStar className="animate-pulse" />
-                </div>
-                <h3 className="mb-4 text-2xl font-black text-white md:text-3xl">
-                 این مقاله برات مفید بود؟
+              <div className="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-slate-900/95 via-amber-950/25 to-orange-950/30 p-8 text-center shadow-[0_18px_55px_rgba(0,0,0,0.28)] sm:p-10">
+                <h3 className="flex flex-col items-center justify-center gap-3 mb-4 text-xl font-black text-amber-300 drop-shadow sm:flex-row sm:text-2xl">
+                  {/* اضافه کردن flex-col در موبایل باعث میشه آیکون و متن زیر هم بیان و فضا بازتر بشه */}
+                  <FaStar className="animate-bounce" />
+                  <span>این مطلب برات مفید بود؟</span>
                 </h3>
-                <p className="mx-auto mb-10 max-w-md text-lg leading-relaxed text-slate-400">
-                  اگر از مطالعه لذت بردی، با یه قهوه بهم انرژی بده تا با قدرت
-                  بیشتری به تولید محتوای تخصصی ادامه بدم.
+
+                <p className="mx-auto mb-8 max-w-2xl text-[15px] leading-[1.8] text-slate-300 px-2 sm:px-0 sm:text-base sm:leading-8">
+                  با حمایتت بهم انرژی می‌دی که تولید محتوای تخصصی‌تر، رایگان و
+                  باکیفیت‌تر رو ادامه بدم.
                 </p>
+
                 <a
                   href="https://coffeebede.ir/manialipour"
                   target="_blank"
-                  className="inline-flex items-center gap-3 rounded-2xl bg-white px-10 py-5 text-lg font-black text-black transition-all hover:scale-105 hover:bg-cyan-400 active:scale-95"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-xl bg-amber-400 px-6 py-3 text-[15px] font-black text-[#181818] shadow-xl shadow-amber-400/15 transition-all hover:scale-[1.03] hover:bg-amber-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-amber-300 sm:w-auto sm:px-7 sm:text-base"
                 >
-                  <PiCoffeeFill className="text-2xl" />
+                  <PiCoffeeFill className="text-xl" />
                   یه قهوه مهمونم کن
                 </a>
               </div>
