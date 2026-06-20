@@ -14,7 +14,7 @@ export const createBlogSchema = z.object({
 
   cover: z.string().optional(),
 
-  readTime: z.number().min(1).max(60).optional(),
+  readAt: z.number().min(1).max(60).optional(),
 
   tags: z.array(z.string()).optional(),
 
