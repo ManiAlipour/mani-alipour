@@ -3,23 +3,8 @@
 @source "../node_modules/@uploadthing/react/dist";
 
 @font-face {
-  font-family: "Vazir";
-  src: url(/fonts/Vazir.ttf);
-}
-
-@font-face {
-  font-family: "Shabnam";
-  src: url(/fonts/Shabnam.ttf);
-}
-
-@font-face {
   font-family: "Yekan";
   src: url(/fonts/iran_yekan_web_medium.ttf);
-}
-
-@font-face {
-  font-family: "IRSans";
-  src: url(/fonts/IRANSansX-Medium.ttf);
 }
 
 :root {
@@ -32,10 +17,7 @@
   --color-neon-green: var(--neon-green);
   --color-neon-blue: var(--neon-blue);
 
-  --font-vazir: "Vazir";
-  --font-shabnam: "Shabnam";
   --font-yekan: "Yekan";
-  --font-irsans: "IRSans";
 }
 
 html {

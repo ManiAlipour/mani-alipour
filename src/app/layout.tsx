@@ -4,6 +4,20 @@ import MainLayout from "@/components/layouts/MainLayout";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
+import localFont from "next/font/local";
+
+const yekan = localFont({
+  src: [
+    {
+      path: "../../public/fonts/iran_yekan_web_medium.ttf", // مسیر دقیق فایل فونت
+      weight: "500",
+      style: "normal",
+    },
+  ],
+  variable: "--font-yekan",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "مانی علیپور | توسعه دهنده فول استک و نویسنده مقالات وب",
   description:
@@ -59,7 +73,9 @@ export default function RootLayout({
       className="scroll-smooth"
     >
       <body
-        className="bg-gradient-to-br from-cyan-950 via-slate-900 to-cyan-950 text-white font-yekan"
+        className={`text-white bg-gradient-to-br from-cyan-950 via-slate-900 to-cyan-950 ${
+          yekan.className
+        }`}
         style={{
           minHeight: "100dvh",
         }}
