@@ -57,8 +57,7 @@ export default function BlogLikeButton({ id }: { id: string }) {
       transition-all duration-300"
     >
       <div
-        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100
-        blur-xl transition pointer-events-none"
+        className="absolute inset-0 transition opacity-0 pointer-events-none rounded-xl group-hover:opacity-100 blur-xl"
         style={{
           background:
             "radial-gradient(circle, oklch(68.5% 0.169 237.323 / 0.35), transparent 70%)",

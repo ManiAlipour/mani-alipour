@@ -4,6 +4,7 @@ import ReadingProgress from "@/components/sections/blogs/ReadingProgress";
 import ShareBlogButton from "@/components/sections/blogs/ShareBlogButton";
 import Link from "next/link";
 import Image from "next/image";
+import { Suspense } from "react";
 import {
   FaArrowRight,
   FaHashtag,
@@ -33,6 +34,22 @@ const RelatedBlogs = dynamic(
     ),
   },
 );
+
+async function BlogViews({ blogId }: { blogId: string }) {
+  const views = await getView(blogId);
+
+  return <span>{views ?? 0} بازدید</span>;
+}
+
+async function RelatedBlogsSection({ currentSlug }: { currentSlug: string }) {
+  const allBlogs = await fetchPublishedBlogs({ limit: 6 });
+
+  const related = allBlogs
+    .filter((item) => item.slug !== currentSlug)
+    .slice(0, 3);
+
+  return <RelatedBlogs blogs={related} />;
+}
 
 interface IBlogPage {
   params: Promise<{ slug: string }>;
@@ -64,13 +81,6 @@ export default async function BlogPage({ params }: IBlogPage) {
   const blog = await getBlog(slug);
 
   if (!blog) notFound();
-
-  const [views, allBlogs] = await Promise.all([
-    getView(blog._id),
-    fetchPublishedBlogs({ limit: 6 }),
-  ]);
-
-  const related = allBlogs.filter((item) => item.slug !== slug).slice(0, 3);
 
   const { toc, updatedHtml } = generateToc(blog.content);
 
@@ -131,8 +141,12 @@ export default async function BlogPage({ params }: IBlogPage) {
                 alt={blog.title}
                 fill
                 priority
+                fetchPriority="high"
+                sizes="(max-width: 1280px) calc(100vw - 48px), 1280px"
+                quality={80}
                 className="object-cover"
               />
+
               <div className="absolute inset-0 bg-gradient-to-t from-[#0d1117]/60 to-transparent" />
             </div>
           )}
@@ -201,7 +215,10 @@ export default async function BlogPage({ params }: IBlogPage) {
 
                   <div className="flex items-center gap-2 px-3 py-3 border rounded-2xl border-white/5 bg-white/2 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
                     <FaEye className="text-slate-500" />
-                    <span>{views ?? 0} بازدید</span>
+
+                    <Suspense fallback={<span>— بازدید</span>}>
+                      <BlogViews blogId={blog._id} />
+                    </Suspense>
                   </div>
                 </div>
               </header>
@@ -240,7 +257,13 @@ export default async function BlogPage({ params }: IBlogPage) {
           </div>
 
           <footer className="pt-20 border-t mt-28 border-white/5">
-            <RelatedBlogs blogs={related} />
+            <Suspense
+              fallback={
+                <div className="h-48 animate-pulse rounded-2xl bg-white/5" />
+              }
+            >
+              <RelatedBlogsSection currentSlug={slug} />
+            </Suspense>
           </footer>
         </article>
       </main>
