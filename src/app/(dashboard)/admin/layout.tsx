@@ -1,6 +1,7 @@
 import AdminLayout from "@/components/layouts/AdminLayout";
 import type { ReactNode } from "react";
 import { Metadata } from "next";
+import "./admin.css"
 
 export const metadata: Metadata = {
   robots: {

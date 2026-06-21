@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "uploadthing/tw/v4";
-@source "../node_modules/@uploadthing/react/dist";
 
 :root {
   --neon-green: oklch(77.7% 0.152 181.912);
@@ -11,15 +9,12 @@
 @theme inline {
   --color-neon-green: var(--neon-green);
   --color-neon-blue: var(--neon-blue);
-
 }
 
 html {
-  html {
-    color-scheme: dark !important;
-    forced-color-adjust: none !important;
-    scroll-behavior: smooth;
-  }
+  color-scheme: dark;
+  forced-color-adjust: none;
+  scroll-behavior: smooth;
 }
 
 [id] {
