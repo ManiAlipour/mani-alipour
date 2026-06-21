@@ -8,7 +8,7 @@ export default function BlogViews({ blogId }: { blogId: string }) {
   useEffect(() => {
     fetch(`/api/blogs/${blogId}/view`, { cache: "no-store" })
       .then((res) => res.json())
-      .then((data) => setViews(data.views ?? 0));
+      .then((data) => setViews(data.data.totalViews ?? 0));
   }, [blogId]);
 
   return <span>{views ?? "—"} بازدید</span>;
