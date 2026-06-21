@@ -6,7 +6,7 @@ export default function BlogViews({ blogId }: { blogId: string }) {
   const [views, setViews] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch(`/api/blogs/${blogId}/views`, { cache: "no-store" })
+    fetch(`/api/blogs/${blogId}/view`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => setViews(data.views ?? 0));
   }, [blogId]);
