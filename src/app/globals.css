@@ -2,11 +2,6 @@
 @import "uploadthing/tw/v4";
 @source "../node_modules/@uploadthing/react/dist";
 
-@font-face {
-  font-family: "Yekan";
-  src: url(/fonts/iran_yekan_web_medium.ttf);
-}
-
 :root {
   --neon-green: oklch(77.7% 0.152 181.912);
   --neon-blue: oklch(78.9% 0.154 211.53);
@@ -17,7 +12,6 @@
   --color-neon-green: var(--neon-green);
   --color-neon-blue: var(--neon-blue);
 
-  --font-yekan: "Yekan";
 }
 
 html {
