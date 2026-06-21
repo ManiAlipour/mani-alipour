@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     description: post.excerpt,
 
-    keywords: post.tags.map((t) => t.name),
+    keywords: post.tags.map((t: { name: string }) => t.name),
 
     alternates: {
       canonical: `https://manialipour.ir/blogs/${post.slug}`,

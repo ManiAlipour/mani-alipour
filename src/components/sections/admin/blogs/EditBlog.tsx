@@ -48,7 +48,7 @@ const validationSchema = yup.object({
 });
 
 interface EditBlogFormProps {
-  blog: any; // یا TBlog
+  blog: any;
   onClose: () => void;
   refetch: () => Promise<void>;
 }
@@ -99,35 +99,6 @@ export default function EditBlogForm({
     },
   });
 
-  // تابع آپلود فایل
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    setIsUploading(true);
-    const uploadToast = toast.loading("در حال آپلود تصویر...");
-
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("آپلود ناموفق بود");
-
-      const data = await res.json();
-      formik.setFieldValue("cover", data.url);
-      toast.success("تصویر با موفقیت آپلود شد", { id: uploadToast });
-    } catch (error) {
-      toast.error("خطا در آپلود تصویر", { id: uploadToast });
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   const allTags = tagsResponse.data?.data ?? [];
 
   return (
@@ -156,14 +127,13 @@ export default function EditBlogForm({
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-red-400 transition-colors"
+            className="text-gray-400 transition-colors hover:text-red-400"
           >
             <FaTimesCircle size={22} />
           </button>
         </div>
 
-        {/* Title & Slug */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <FancyInputBox
             icon={<FiEdit2 />}
             label="عنوان جدید"
@@ -179,7 +149,7 @@ export default function EditBlogForm({
         </div>
 
         {/* Read Time & Photo Upload Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           <FancyInputBox
             icon={<FaRegClock />}
             label="زمان مطالعه"
@@ -189,8 +159,8 @@ export default function EditBlogForm({
           />
 
           {/* بخش آپلود عکس اختصاصی */}
-          <div className="md:col-span-2 flex flex-col gap-2">
-            <label className="text-sm font-bold text-neon-blue flex items-center gap-2">
+          <div className="flex flex-col gap-2 md:col-span-2">
+            <label className="flex items-center gap-2 text-sm font-bold text-neon-blue">
               <BsImage /> تصویر کاور
             </label>
             <div className="relative group overflow-hidden bg-black/20 border-2 border-dashed border-white/10 hover:border-neon-blue/50 rounded-2xl transition-all h-[58px] flex items-center px-4">
@@ -200,8 +170,8 @@ export default function EditBlogForm({
                   <span className="text-sm">در حال آپلود...</span>
                 </div>
               ) : (
-                <label className="flex items-center gap-3 w-full cursor-pointer">
-                  <FiUploadCloud className="text-neon-green text-xl" />
+                <label className="flex items-center w-full gap-3 cursor-pointer">
+                  <FiUploadCloud className="text-xl text-neon-green" />
                   <span className="text-sm text-gray-400 truncate">
                     {formik.values.cover
                       ? "تغییر تصویر کاور"
@@ -235,11 +205,11 @@ export default function EditBlogForm({
                 </label>
               )}
               {formik.values.cover && !isUploading && (
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg overflow-hidden border border-white/20">
+                <div className="absolute w-10 h-10 overflow-hidden -translate-y-1/2 border rounded-lg left-2 top-1/2 border-white/20">
                   <img
                     src={formik.values.cover}
                     alt="Preview"
-                    className="w-full h-full object-cover"
+                    className="object-cover w-full h-full"
                   />
                 </div>
               )}
@@ -264,10 +234,10 @@ export default function EditBlogForm({
 
         {/* Tags Section */}
         <div className="space-y-3">
-          <label className="text-sm font-bold text-neon-blue flex items-center gap-2">
+          <label className="flex items-center gap-2 text-sm font-bold text-neon-blue">
             <PiTagFill className="text-neon-green" /> انتخاب برچسب‌ها
           </label>
-          <div className="flex flex-wrap gap-2 p-3 bg-black/20 rounded-2xl border border-white/5">
+          <div className="flex flex-wrap gap-2 p-3 border bg-black/20 rounded-2xl border-white/5">
             {allTags.map((tag) => {
               const isSelected = formik.values.tags.includes(tag._id);
               return (
@@ -302,7 +272,7 @@ export default function EditBlogForm({
 
         {/* Editor */}
         <div className="space-y-2">
-          <label className="text-sm font-bold text-neon-blue flex items-center gap-2">
+          <label className="flex items-center gap-2 text-sm font-bold text-neon-blue">
             <HiDocumentText /> محتوای متنی
           </label>
           <Editor
@@ -314,9 +284,9 @@ export default function EditBlogForm({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-4">
+        <div className="flex flex-col items-center justify-between gap-4 mt-4 md:flex-row">
           <div className="flex items-center gap-3">
-            <div className="relative inline-flex cursor-pointer items-center">
+            <div className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 id="isPublishedEdit"
@@ -325,8 +295,8 @@ export default function EditBlogForm({
                 name="isPublished"
                 className="sr-only peer"
               />
-              <div className="w-12 h-6 bg-slate-700 peer-checked:bg-gradient-to-r peer-checked:from-neon-green peer-checked:to-neon-blue rounded-full transition-all"></div>
-              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all peer-checked:translate-x-6"></div>
+              <div className="w-12 h-6 transition-all rounded-full bg-slate-700 peer-checked:bg-gradient-to-r peer-checked:from-neon-green peer-checked:to-neon-blue"></div>
+              <div className="absolute w-4 h-4 transition-all bg-white rounded-full left-1 top-1 peer-checked:translate-x-6"></div>
             </div>
             <label
               htmlFor="isPublishedEdit"
@@ -336,11 +306,11 @@ export default function EditBlogForm({
             </label>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="flex items-center w-full gap-3 md:w-auto">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 rounded-2xl bg-slate-800 text-gray-400 font-bold hover:bg-slate-700 transition-all"
+              className="px-6 py-3 font-bold text-gray-400 transition-all rounded-2xl bg-slate-800 hover:bg-slate-700"
             >
               انصراف
             </button>

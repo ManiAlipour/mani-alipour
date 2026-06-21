@@ -16,7 +16,6 @@ import {
 } from "react-icons/fa";
 import { MdOutlineDateRange } from "react-icons/md";
 import { notFound } from "next/navigation";
-import { getView } from "@/utils/api/blog/set-view";
 import dynamic from "next/dynamic";
 import { generateToc } from "@/lib/generateToc";
 import { Metadata } from "next";
@@ -24,6 +23,8 @@ import ViewCounter from "@/components/providers/ViewConuter";
 import CommentsSection from "@/components/sections/blogs/comments";
 import BlogLikeButton from "@/components/features/BlogLikeButton";
 import { PiCoffeeFill } from "react-icons/pi";
+import { unstable_cache } from "next/cache";
+import BlogViews from "@/components/sections/blogs/BlogViews";
 
 const RelatedBlogs = dynamic(
   () => import("@/components/sections/blogs/RelatedBlogs"),
@@ -34,12 +35,6 @@ const RelatedBlogs = dynamic(
     ),
   },
 );
-
-async function BlogViews({ blogId }: { blogId: string }) {
-  const views = await getView(blogId);
-
-  return <span>{views ?? 0} بازدید</span>;
-}
 
 async function RelatedBlogsSection({ currentSlug }: { currentSlug: string }) {
   const allBlogs = await fetchPublishedBlogs({ limit: 6 });

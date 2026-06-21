@@ -3,6 +3,9 @@ import { CreateBlogInput } from "@/lib/validators/blog.validator";
 import { UpdateBlogInput } from "@/lib/validators/blog.validator";
 import "@/models/User";
 import "@/models/Tag";
+import { revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
+import Tag from "@/models/Tag";
 
 export async function createBlogService(
   data: CreateBlogInput,
@@ -41,7 +44,6 @@ export async function getBlogsService(
   if (tag && tag.trim() !== "") {
     query["tags"] = { $exists: true, $ne: [] };
 
-    const Tag = require("@/models/Tag").default;
     const foundTag = await Tag.findOne({ slug: tag }).select("_id");
     if (!foundTag) {
       return {
@@ -95,9 +97,14 @@ export async function updateBlogService(id: string, data: UpdateBlogInput) {
     throw new Error("مقاله پیدا نشد");
   }
 
+  revalidateTag(`blog:${blog.slug}`, "max");
+  revalidateTag("blogs", "max");
+
+  revalidatePath(`/blogs/${blog.slug}`);
+  revalidatePath("/blogs");
+
   return blog;
 }
-
 export async function deleteBlogService(id: string) {
   const blog = await Blog.findByIdAndDelete(id);
 
