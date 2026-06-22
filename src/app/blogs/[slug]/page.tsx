@@ -23,8 +23,19 @@ import ViewCounter from "@/components/providers/ViewConuter";
 import CommentsSection from "@/components/sections/blogs/comments";
 import BlogLikeButton from "@/components/features/BlogLikeButton";
 import { PiCoffeeFill } from "react-icons/pi";
-import { unstable_cache } from "next/cache";
 import BlogViews from "@/components/sections/blogs/BlogViews";
+
+const SITE_URL = "https://manialipour.ir";
+
+function getAbsoluteUrl(url?: string | null) {
+  if (!url) return undefined;
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  return `${SITE_URL}${url.startsWith("/") ? url : `/${url}`}`;
+}
 
 const RelatedBlogs = dynamic(
   () => import("@/components/sections/blogs/RelatedBlogs"),
@@ -57,16 +68,45 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getBlog(slug);
+
   if (!post) return {};
+
+  const canonicalUrl = `${SITE_URL}/blogs/${post.slug}`;
+  const coverUrl = getAbsoluteUrl(post.cover);
+  const keywords = post.tags?.map((tag: any) => tag.name).filter(Boolean);
 
   return {
     title: post.title,
     description: post.excerpt,
-    alternates: { canonical: `https://manialipour.ir/blogs/${post.slug}` },
+    keywords,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
+      type: "article",
+      url: canonicalUrl,
       title: post.title,
       description: post.excerpt,
-      images: [{ url: post.cover || "" }],
+      images: coverUrl
+        ? [
+            {
+              url: coverUrl,
+              alt: post.title,
+            },
+          ]
+        : [],
+      publishedTime: post.createdAt,
+      modifiedTime: post.updatedAt || post.createdAt,
+      authors: [post.author?.name ?? "مانی علی‌پور"],
+      tags: keywords,
+      locale: "fa_IR",
+      siteName: "مانی علی‌پور",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: coverUrl ? [coverUrl] : [],
     },
   };
 }
@@ -78,6 +118,43 @@ export default async function BlogPage({ params }: IBlogPage) {
   if (!blog) notFound();
 
   const { toc, updatedHtml } = generateToc(blog.content);
+
+  const canonicalUrl = `${SITE_URL}/blogs/${blog.slug}`;
+  const coverUrl = getAbsoluteUrl(blog.cover);
+  const authorName = blog.author?.name ?? "مانی علی‌پور";
+  const keywords = blog.tags?.map((tag: any) => tag.name).filter(Boolean) ?? [];
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${canonicalUrl}#blogposting`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": canonicalUrl,
+    },
+    url: canonicalUrl,
+    headline: blog.title,
+    name: blog.title,
+    description: blog.excerpt,
+    image: coverUrl ? [coverUrl] : undefined,
+    datePublished: blog.createdAt,
+    dateModified: blog.updatedAt || blog.createdAt,
+    inLanguage: "fa-IR",
+    isAccessibleForFree: true,
+    author: {
+      "@type": "Person",
+      name: authorName,
+      url: `${SITE_URL}/about`,
+    },
+    publisher: {
+      "@type": "Person",
+      name: "مانی علی‌پور",
+      url: SITE_URL,
+    },
+    keywords: keywords.length > 0 ? keywords.join(", ") : undefined,
+    articleSection: keywords.length > 0 ? keywords : undefined,
+    timeRequired: blog.readAt ? `PT${blog.readAt}M` : "PT5M",
+  };
 
   const TocComponent = (
     <div className="rounded-3xl border border-white/5 bg-white/[0.02] p-7 backdrop-blur-sm max-h-[calc(100vh-160px)] flex flex-col">
@@ -106,6 +183,13 @@ export default async function BlogPage({ params }: IBlogPage) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+
       <ViewCounter blogId={blog._id} />
       <ReadingProgress />
 
@@ -185,12 +269,15 @@ export default async function BlogPage({ params }: IBlogPage) {
 
                 {/* Metadata */}
                 <div className="grid grid-cols-2 gap-3 text-sm text-slate-400 lg:flex lg:flex-wrap lg:items-center lg:gap-6">
-                  <Link href="/about" className="flex items-center gap-2 px-3 py-3 border bg-white/2 rounded-2xl border-white/5 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
+                  <Link
+                    href="/about"
+                    className="flex items-center gap-2 px-3 py-3 border bg-white/2 rounded-2xl border-white/5 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10"
+                  >
                     <div className="relative w-8 h-8 overflow-hidden border rounded-full shrink-0 border-cyan-500/30">
                       <FaUser className="absolute inset-0 m-auto text-cyan-500" />
                     </div>
                     <span className="truncate text-slate-200">
-                      {blog.author?.name ?? "مانی علی‌پور"}
+                      {authorName}
                     </span>
                   </Link>
 
