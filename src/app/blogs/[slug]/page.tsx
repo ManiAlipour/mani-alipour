@@ -192,7 +192,7 @@ export default async function BlogPage({ params }: IBlogPage) {
                     <span className="truncate text-slate-200">
                       {blog.author?.name ?? "مانی علی‌پور"}
                     </span>
-                  </Lin>
+                  </Link>
 
                   <div className="flex items-center gap-2 px-3 py-3 border rounded-2xl border-white/5 bg-white/2 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
                     <MdOutlineDateRange className="text-slate-500" />
