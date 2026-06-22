@@ -185,16 +185,16 @@ export default async function BlogPage({ params }: IBlogPage) {
 
                 {/* Metadata */}
                 <div className="grid grid-cols-2 gap-3 text-sm text-slate-400 lg:flex lg:flex-wrap lg:items-center lg:gap-6">
-                  <div className="flex items-center gap-2 rounded-2xl border border-white/5 bg-white/[0.02] px-3 py-3 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
+                  <Link href="/about" className="flex items-center gap-2 px-3 py-3 border bg-white/2 rounded-2xl border-white/5 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
                     <div className="relative w-8 h-8 overflow-hidden border rounded-full shrink-0 border-cyan-500/30">
                       <FaUser className="absolute inset-0 m-auto text-cyan-500" />
                     </div>
                     <span className="truncate text-slate-200">
                       {blog.author?.name ?? "مانی علی‌پور"}
                     </span>
-                  </div>
+                  </Lin>
 
-                  <div className="flex items-center gap-2 rounded-2xl border border-white/5 bg-white/[0.02] px-3 py-3 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
+                  <div className="flex items-center gap-2 px-3 py-3 border rounded-2xl border-white/5 bg-white/2 lg:border-0 lg:bg-transparent lg:p-0 lg:pl-6 lg:border-l lg:border-white/10">
                     <MdOutlineDateRange className="text-slate-500" />
                     <span>
                       {blog.createdAt
