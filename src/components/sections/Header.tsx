@@ -51,7 +51,7 @@ export default function Header() {
       {/* LOGO & TITLE */}
       <div className="flex items-center gap-2 xs:gap-2.5 sm:gap-3 md:gap-4 min-w-0">
         <Image
-          className="rounded-full border-2 border-cyan-400 shadow-lg shrink-0"
+          className="border-2 rounded-full shadow-lg border-cyan-400 shrink-0"
           alt="logo"
           src="/mani-alipour-logo.ico"
           width={38}
@@ -74,7 +74,7 @@ export default function Header() {
       </div>
 
       {/* Desktop NAV & actions */}
-      <nav className="hidden lg:flex gap-6 xl:gap-10 items-center ml-3 flex-1 justify-center min-w-0">
+      <nav className="items-center justify-center flex-1 hidden min-w-0 gap-6 ml-3 lg:flex xl:gap-10">
         {links.map((l, i) => (
           <div
             key={i}
@@ -97,7 +97,6 @@ export default function Header() {
             >
               {l.title}
             </Link>
-            {/* HOVER ANIMATION GLIDER */}
             <motion.div
               className="absolute bottom-0.5 left-1/2 h-[3px] rounded-2xl bg-linear-to-r from-cyan-400 to-neon-green"
               initial={false}
@@ -138,12 +137,7 @@ export default function Header() {
 
         <button
           aria-label={mobileOpen ? "بستن منو" : "باز کردن منو"}
-          className="
-            flex lg:hidden text-cyan-300 bg-cyan-900/40 p-2 rounded-lg
-            shadow-neon-cyan border border-cyan-700/20
-            hover:bg-cyan-900/60 focus:outline-none focus:ring-2 focus:ring-cyan-400
-            transition active:scale-95
-          "
+          className="flex p-2 transition border rounded-lg lg:hidden text-cyan-300 bg-cyan-900/40 shadow-neon-cyan border-cyan-700/20 hover:bg-cyan-900/60 focus:outline-none focus:ring-2 focus:ring-cyan-400 active:scale-95"
           onClick={() => setMobileOpen((v) => !v)}
         >
           {mobileOpen ? (
@@ -174,12 +168,12 @@ export default function Header() {
           >
             {/* Close btn */}
             <div className="flex items-center justify-between mb-2 xs:mb-5">
-              <span className="text-xl font-bold text-cyan-300 select-none">
+              <span className="text-xl font-bold select-none text-cyan-300">
                 ناوبری
               </span>
               <button
                 aria-label="بستن منو"
-                className="p-2 rounded-lg text-cyan-300 border border-cyan-800/40 hover:bg-cyan-950/60"
+                className="p-2 border rounded-lg text-cyan-300 border-cyan-800/40 hover:bg-cyan-950/60"
                 onClick={() => setMobileOpen(false)}
               >
                 <FiX className="w-6 h-6" />
@@ -205,7 +199,7 @@ export default function Header() {
             <div className="flex flex-col gap-2 xs:gap-3">
               <AuthButton />
             </div>
-            <div className="mt-auto flex items-center justify-center pt-6 opacity-70 text-xs xs:text-sm text-cyan-100 font-yekan select-none">
+            <div className="flex items-center justify-center pt-6 mt-auto text-xs select-none opacity-70 xs:text-sm text-cyan-100 font-yekan">
               © 2024 mani.alipour
             </div>
           </motion.nav>
@@ -223,7 +217,7 @@ export default function Header() {
             transition={{ duration: 0.17 }}
             className="fixed inset-0 z-9900 bg-linear-to-br from-cyan-800/50 to-slate-950/80 backdrop-blur-[2.5px] lg:hidden"
             onClick={() => setMobileOpen(false)}
-            aria-hidden
+            aria-label="بستن منو"
           />
         )}
       </AnimatePresence>

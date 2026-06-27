@@ -72,7 +72,7 @@ export default function AddCommentForm({ postId, slug }: Props) {
   if (!user) {
     return (
       <div className="mt-12 overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] p-8 text-center backdrop-blur-md">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-white/40">
+        <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-white/5 text-white/40">
           <HiOutlineLockClosed size={24} />
         </div>
         <h3 className="mb-2 text-lg font-medium text-white">
@@ -111,9 +111,9 @@ export default function AddCommentForm({ postId, slug }: Props) {
           boxShadow: isFocused ? `0 0 20px -10px ${neonBlue}` : "none",
         }}
       >
-        <div className="flex flex-col md:flex-row gap-4 p-4">
+        <div className="flex flex-col gap-4 p-4 md:flex-row">
           <div className="hidden shrink-0 md:block">
-            <div className="h-10 w-10 overflow-hidden rounded-full border border-white/10 ring-2 ring-white/5 flex justify-center items-center">
+            <div className="flex items-center justify-center w-10 h-10 overflow-hidden border rounded-full border-white/10 ring-2 ring-white/5">
               <FaUser />
             </div>
           </div>
@@ -126,25 +126,21 @@ export default function AddCommentForm({ postId, slug }: Props) {
               onBlur={() => setIsFocused(false)}
               placeholder={`${user.name} عزیز، نظرت رو اینجا بنویس...`}
               rows={3}
-              className="w-full resize-none bg-transparent p-2 text-sm text-white/90 outline-none placeholder:text-white/20"
+              className="w-full p-2 text-sm bg-transparent outline-none resize-none text-white/90 placeholder:text-white/20"
             />
 
-            <div className="flex items-center justify-between border-t border-white/5 pt-4">
-              <span className="text-[10px] text-white/30 tracking-widest uppercase">
-                Markdown Supported
-              </span>
-
+            <div className="flex items-center justify-between pt-4 border-t border-white/5">
               <button
                 disabled={loading || !comment.trim()}
                 type="submit"
-                className="group relative flex items-center gap-2 overflow-hidden rounded-xl px-6 py-2 text-sm font-bold transition-all disabled:opacity-50"
+                className="relative flex items-center gap-2 px-6 py-2 overflow-hidden text-sm font-bold transition-all group rounded-xl disabled:opacity-50"
                 style={{
                   backgroundColor: neonBlue,
                   color: "#000",
                 }}
               >
                 {loading ? (
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+                  <div className="w-5 h-5 border-2 rounded-full animate-spin border-black/30 border-t-black" />
                 ) : (
                   <>
                     <span>ارسال نظر</span>

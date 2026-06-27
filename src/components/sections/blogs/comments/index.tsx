@@ -38,17 +38,16 @@ export default async function CommentsSection({
     <section className="mt-24 space-y-12">
       <div
         id="comments"
-        className="flex items-center gap-3 text-neon-green text-3xl font-bold"
+        className="flex items-center gap-3 text-3xl font-bold text-neon-green"
       >
         <FaRegComments />
         <span>کامنت ها</span>
-        <span className="text-sm text-white/40 font-normal">
+        <span className="text-sm font-normal text-slate-300">
           ({comments.length})
         </span>
       </div>
 
       <AddCommentForm postId={postId} slug={slug} />
-
 
       <CommentsLists comments={comments} />
     </section>

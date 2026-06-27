@@ -44,7 +44,7 @@ function usePrismRtlEnhancements() {
       const button = document.createElement("button");
       button.textContent = "Copy";
       button.className =
-        "prism-copy-btn absolute top-2 right-2 px-4 py-1 rounded-lg font-mono drop-shadow bg-cyan-900/90 text-neon-cyan text-sm border border-cyan-400/40 hover:bg-neon-cyan/30 hover:text-black transition-all focus:outline-none";
+        "absolute px-4 py-1 font-mono text-sm transition-all border rounded-lg prism-copy-btn top-2 right-2 drop-shadow bg-cyan-900/90 text-neon-cyan border-cyan-400/40 hover:bg-neon-cyan/30 hover:text-black focus:outline-none";
       button.title = "Copy";
       pre.style.position = "relative";
 

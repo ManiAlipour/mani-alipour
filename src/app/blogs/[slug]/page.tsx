@@ -198,7 +198,7 @@ export default async function BlogPage({ params }: IBlogPage) {
 
       <main className="min-h-screen bg-[#0d1117] pb-20 selection:bg-cyan-500/30">
         {/* Navbar */}
-        <nav className="sticky top-0 z-50 border-b border-white/5 bg-[#0d1117]/80 py-4 backdrop-blur-xl">
+        <nav className="sticky top-0 z-40 border-b border-white/5 bg-[#0d1117]/80 py-4 backdrop-blur-xl">
           <div className="flex items-center justify-between px-6 mx-auto max-w-7xl">
             <Link
               href="/blogs"
@@ -240,8 +240,9 @@ export default async function BlogPage({ params }: IBlogPage) {
                 {toc.length > 0 && TocComponent}
 
                 <div className="px-2">
-                  <h3 className="flex items-center gap-2 mb-4 text-xs font-bold tracking-widest uppercase text-slate-500">
-                    <FaHashtag className="text-cyan-600" /> برچسب‌ها
+                  <h3 className="flex items-center gap-2 mb-4 text-xs font-bold tracking-widest uppercase text-slate-300">
+                    <FaHashtag className="text-cyan-400" aria-hidden="true" />
+                    برچسب‌ها
                   </h3>
 
                   <div className="flex flex-wrap gap-2">
