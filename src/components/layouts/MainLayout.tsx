@@ -5,7 +5,7 @@ import Footer from "../sections/Footer";
 import Header from "../sections/Header";
 import { Toaster } from "react-hot-toast";
 
-import { useEffect } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const HIDE_LAYOUT_PATHS = ["/auth", "/dashboard", "/admin"];
 
@@ -29,6 +29,7 @@ export default function MainLayout({
 
   return (
     <RootProvider>
+      <SpeedInsights />
       <div>
         <Toaster
           position="top-center"

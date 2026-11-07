@@ -38,7 +38,6 @@ likeSchema.index(
   },
 );
 
-// جلوگیری از لایک تکراری برای کاربران مهمان
 likeSchema.index(
   { postId: 1, visitorId: 1 },
   {

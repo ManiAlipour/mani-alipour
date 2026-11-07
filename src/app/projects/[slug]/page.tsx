@@ -23,13 +23,25 @@ export async function generateMetadata({ params }: ProjectPageProps) {
 
   if (!project) return { title: "پروژه یافت نشد" };
 
+  const canonicalUrl = `https://manialipour.ir/projects/${project.slug}`;
+  const description = project.shortDescription || project.description.replace(/<[^>]*>/g, " ").slice(0, 160);
+
   return {
     title: project.title,
-    description: project.shortDescription || project.description.slice(0, 160),
+    description,
+    alternates: { canonical: canonicalUrl },
     openGraph: {
+      type: "article",
+      url: canonicalUrl,
       title: project.title,
-      description: project.shortDescription,
+      description,
       images: project.coverImage ? [{ url: project.coverImage }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description,
+      images: project.coverImage ? [project.coverImage] : [],
     },
   };
 }

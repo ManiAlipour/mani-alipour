@@ -11,50 +11,76 @@ import { RootState } from "@/store";
 export default function BlogLikeButton({ id }: { id: string }) {
   const dispatch = useDispatch();
 
-  const likedBlogs = useSelector((state: RootState) => state.likedBlogs);
-
-  const liked = likedBlogs.includes(id);
+  const liked = useSelector((state: RootState) =>
+    state.likedBlogs.includes(id),
+  );
 
   const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchLike = async () => {
-      const res = await fetch(`/api/blogs/${id}/like`);
-      const data = await res.json();
+      try {
+        const res = await fetch(`/api/blogs/${id}/like`, {
+          signal: controller.signal,
+        });
 
-      const { likeCount } = data.data;
+        if (!res.ok) throw new Error("Failed to fetch likes");
 
-      setCount(likeCount);
+        const data = await res.json();
+        setCount(data.data.likeCount);
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Like fetch error:", err);
+        }
+      }
     };
 
     fetchLike();
+
+    return () => controller.abort();
   }, [id]);
 
+  const updateCount = (isLiked: boolean) => {
+    setCount((prev) => (isLiked ? prev + 1 : prev - 1));
+  };
+
   const handleLike = async () => {
-    const optimisticLiked = !liked;
+    if (loading) return;
+
+    setLoading(true);
+
+    const optimistic = !liked;
 
     dispatch(toggleBlog(id));
-
-    setCount((prev) => (optimisticLiked ? prev + 1 : prev - 1));
+    updateCount(optimistic);
 
     try {
-      await fetch(`/api/blogs/${id}/like`, {
+      const res = await fetch(`/api/blogs/${id}/like`, {
         method: "POST",
       });
-    } catch {
+
+      if (!res.ok) throw new Error("Failed to update like");
+    } catch (err) {
       dispatch(toggleBlog(id));
-      setCount((prev) => (optimisticLiked ? prev - 1 : prev + 1));
+      updateCount(!optimistic);
+      console.error("Like update error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <motion.button
       onClick={handleLike}
+      disabled={loading}
       whileTap={{ scale: 0.9 }}
       className="group relative flex items-center gap-2 px-4 py-2 rounded-xl
       bg-white/5 backdrop-blur-md border border-white/10
       hover:border-[oklch(68.5%_0.169_237.323)]
-      transition-all duration-300"
+      transition-all duration-300 disabled:opacity-50"
     >
       <div
         className="absolute inset-0 transition opacity-0 pointer-events-none rounded-xl group-hover:opacity-100 blur-xl"

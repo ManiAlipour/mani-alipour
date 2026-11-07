@@ -5,25 +5,30 @@ import Image from "next/image";
 export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <div className="group relative flex flex-col items-stretch rounded-[1.5rem] border border-cyan-900/50 shadow-xl overflow-hidden bg-gradient-to-br from-[#18243c]/95 to-[#222f47]/95 hover:scale-[1.025] hover:-translate-y-2 transition-transform duration-300 hover:shadow-2xl cursor-pointer">
-      <div className="relative overflow-hidden aspect-video w-full bg-cyan-950/40">
-        {project.coverImage ? (
-          <img
-            src={project.coverImage}
+      <Link
+        href={`/projects/${project.slug}`}
+        className="relative w-full overflow-hidden aspect-video bg-cyan-950/40"
+      >
+        {project.gallery &&
+        project.gallery[0] &&
+        project.gallery[0].trim() !== "" ? (
+          <Image
+            src={project.gallery[0]}
             alt={project.title}
             title={`تصویر پروژه: ${project.title}`}
             loading="lazy"
-            className="object-cover w-full h-full scale-105 group-hover:scale-110 transition-transform duration-500"
+            className="object-cover w-full h-full transition-transform duration-500 scale-105 group-hover:scale-110"
             style={{
               filter:
                 project.status === "in-progress" ? "grayscale(30%)" : undefined,
             }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl text-cyan-200/80 bg-cyan-950/30">
+          <div className="flex items-center justify-center w-full h-full text-6xl text-cyan-200/80 bg-cyan-950/30">
             🚀
           </div>
         )}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+        <div className="absolute z-10 flex flex-col gap-2 top-3 right-3">
           <span
             className={`px-2 py-1 text-xs rounded-2xl font-bold shadow border
             ${
@@ -48,7 +53,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </span>
           )}
         </div>
-        <div className="absolute bottom-2 left-2 flex gap-2 z-10">
+        <div className="absolute z-10 flex gap-2 bottom-2 left-2">
           {project.gallery && project.gallery.length > 0 && (
             <div className="flex gap-1">
               {project.gallery.slice(0, 2).map((img: string, j: number) => (
@@ -57,14 +62,14 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                   src={img}
                   alt={`عکس ${j + 1} ${project.title}`}
                   title={`عکس ${j + 1} ${project.title}`}
-                  className="w-8 h-8 rounded border border-cyan-500/25 object-cover shadow-md"
+                  className="object-cover w-8 h-8 border rounded shadow-md border-cyan-500/25"
                   loading="lazy"
                   width={32}
                   height={32}
                 />
               ))}
               {project.gallery.length > 2 && (
-                <span className="bg-cyan-950/70 text-cyan-100 px-2 py-1 rounded text-xs flex items-center border border-cyan-900/50">
+                <span className="flex items-center px-2 py-1 text-xs border rounded bg-cyan-950/70 text-cyan-100 border-cyan-900/50">
                   +{project.gallery.length - 2}
                 </span>
               )}
@@ -72,23 +77,23 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           )}
         </div>
         <div className="absolute inset-0 w-full h-full bg-gradient-to-t from-[#22365b]/60 via-transparent to-transparent pointer-events-none" />
-      </div>
+      </Link>
 
-      <div className="flex-1 flex flex-col justify-between px-6 py-5 gap-2">
-        <div>
-          <h3 className="text-cyan-200 text-2xl font-black mb-1 group-hover:text-cyan-300 transition">
+      <div className="flex flex-col justify-between flex-1 gap-2 px-6 py-5">
+        <Link href={`/projects/${project.slug}`}>
+          <h3 className="mb-1 text-2xl font-black transition text-cyan-200 group-hover:text-cyan-300">
             {project.title}
           </h3>
           {project.shortDescription && (
-            <p className="text-cyan-300/90 text-base mb-1">
+            <p className="mb-1 text-base text-cyan-300/90">
               {project.shortDescription}
             </p>
           )}
-          <p className="text-cyan-100/90 text-xs md:text-sm mb-2 leading-6 line-clamp-3">
+          <p className="mb-2 text-xs leading-6 text-cyan-100/90 md:text-sm line-clamp-3">
             {project.description}
           </p>
-        </div>
-        <div className="flex flex-wrap gap-2 mb-2 justify-end">
+        </Link>
+        <div className="flex flex-wrap justify-end gap-2 mb-2">
           {project.techStack.map((tech: string) => (
             <span
               key={tech}
@@ -99,7 +104,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           ))}
         </div>
         <div className="flex items-center justify-between mt-3">
-          <span className="text-xs text-cyan-400 font-medium">
+          <span className="text-xs font-medium text-cyan-400">
             {new Date(project.updatedAt).toLocaleDateString("fa-IR", {
               year: "2-digit",
               month: "short",

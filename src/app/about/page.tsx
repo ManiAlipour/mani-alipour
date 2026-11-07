@@ -12,7 +12,6 @@ import {
 } from "react-icons/si";
 import { FaCode, FaRocket, FaUserGraduate, FaSearch } from "react-icons/fa";
 
-// ۱. تنظیم متادیتا برای سئو
 export const metadata: Metadata = {
   title: "درباره من | مانی علیپور - برنامه نویس فول استک",
   description:
@@ -26,6 +25,9 @@ export const metadata: Metadata = {
     "Mani Alipour",
     "Full Stack Developer",
   ],
+  alternates:{
+    canonical: "https://manialipour.ir/about"    
+  },
   openGraph: {
     title: "درباره مانی علیپور | توسعه‌دهنده فول استک وب",
     description: "توسعه محصولات وب مدرن با تمرکز بر عملکرد و تجربه کاربری.",
@@ -61,34 +63,34 @@ const skills = [
 
 export default function AboutPage() {
   return (
-    <main className="max-w-6xl mx-auto p-4 md:p-12 space-y-8">
+    <main className="max-w-6xl p-4 mx-auto space-y-8 md:p-12">
       {/* هدر */}
-      <header className="mb-10 mt-6 md:mt-0 px-2">
-        <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
+      <header className="px-2 mt-6 mb-10 md:mt-0">
+        <h1 className="mb-4 text-3xl font-extrabold leading-tight text-white md:text-5xl">
           درباره <span style={{ color: "var(--neon-blue)" }}>من</span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed">
+        <p className="max-w-2xl text-lg leading-relaxed text-gray-400 md:text-xl">
           برنامه نویس فول استک با تمرکز بر Next.js و بهینه‌سازی وب
         </p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* معرفی */}
-        <MotionWrapper className="md:col-span-2 p-6 md:p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm">
+        <MotionWrapper className="p-6 border md:col-span-2 md:p-8 rounded-3xl border-white/10 bg-white/5 backdrop-blur-sm">
           <div className="flex items-center gap-3 mb-6">
             <FaUserGraduate
               size={22}
               className="shrink-0"
               style={{ color: "var(--neon-blue)" }}
             />
-            <h2 className="text-xl md:text-2xl font-bold text-white leading-snug">
+            <h2 className="text-xl font-bold leading-snug text-white md:text-2xl">
               برنامه نویس فول استک (Next.js Focused)
             </h2>
           </div>
-          <div className="text-base md:text-lg text-gray-300 leading-8 space-y-4">
+          <div className="space-y-4 text-base leading-8 text-gray-300 md:text-lg">
             <p>
               من مانی علیپور هستم؛ توسعه‌دهنده فول استک وب با تمرکز ویژه بر
-              <strong className="text-white font-medium"> Next.js </strong> و
+              <strong className="font-medium text-white"> Next.js </strong> و
               معماری مدرن وب. تخصص من طراحی و پیاده‌سازی کامل پروژه‌ها از UI تا
               Backend و دیتابیس است.
             </p>
@@ -101,7 +103,7 @@ export default function AboutPage() {
         </MotionWrapper>
 
         {/* مهارت‌ها */}
-        <MotionWrapper className="p-6 md:p-8 rounded-3xl border border-white/10 bg-white/5">
+        <MotionWrapper className="p-6 border md:p-8 rounded-3xl border-white/10 bg-white/5">
           <div className="flex items-center gap-3 mb-6">
             <FaCode
               size={22}
@@ -111,11 +113,11 @@ export default function AboutPage() {
             <h3 className="text-xl font-bold text-white">مهارت‌ها</h3>
           </div>
 
-          <div className="grid grid-cols-3 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3 md:grid-cols-2">
             {skills.map((skill) => (
               <div
                 key={skill.name}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5"
+                className="flex flex-col items-center justify-center p-3 transition-colors border rounded-2xl bg-white/5 hover:bg-white/10 border-white/5"
               >
                 <skill.icon size={20} className="mb-2 text-gray-400" />
                 <span className="text-[10px] md:text-xs text-gray-500 font-mono text-center truncate w-full">
@@ -127,16 +129,16 @@ export default function AboutPage() {
         </MotionWrapper>
 
         {/* CTA */}
-        <MotionWrapper className="md:col-span-3 p-8 md:p-12 rounded-3xl border border-white/10 bg-gradient-to-br from-blue-900/20 via-transparent to-green-900/20 text-center">
+        <MotionWrapper className="p-8 text-center border md:col-span-3 md:p-12 rounded-3xl border-white/10 bg-gradient-to-br from-blue-900/20 via-transparent to-green-900/20">
           <FaRocket
             size={28}
             className="mx-auto mb-6"
             style={{ color: "var(--neon-blue)" }}
           />
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
+          <h3 className="mb-4 text-2xl font-bold leading-tight text-white md:text-3xl">
             توسعه حرفه‌ای، ساختار استاندارد، نتیجه قابل اندازه‌گیری
           </h3>
-          <p className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
+          <p className="max-w-2xl mx-auto text-base leading-relaxed text-gray-400 md:text-lg">
             اگر به دنبال توسعه‌دهنده‌ای هستید که علاوه بر کدنویسی، به سئو،
             پرفورمنس و مقیاس‌پذیری پروژه اهمیت بدهد، خوشحال می‌شوم درباره همکاری
             صحبت کنیم.

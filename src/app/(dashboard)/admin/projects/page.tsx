@@ -1,9 +1,11 @@
 "use client";
 
 import { useFetch } from "iso-hooks";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { UploadButton } from "@/utils/uploadthing";
+import toast from "react-hot-toast";
 
 export type IProject = {
   title: string;
@@ -77,6 +79,7 @@ function KeyStatBox({
       <span className="text-xl font-extrabold text-neon-blue drop-shadow">
         {value}
       </span>
+
       <span className="text-xs text-cyan-100 mt-1">{label}</span>
     </div>
   );
@@ -84,9 +87,11 @@ function KeyStatBox({
 
 function Stats({ stats }: { stats: IStats | undefined }) {
   if (!stats) return null;
+
   return (
     <div className="flex gap-4 mb-8 flex-wrap justify-center">
       <KeyStatBox label="تعداد پروژه‌ها" value={stats.totalProjects ?? "-"} />
+
       <KeyStatBox
         label="میانگین بلاگ/پروژه"
         value={
@@ -95,6 +100,7 @@ function Stats({ stats }: { stats: IStats | undefined }) {
             : "-"
         }
       />
+
       <KeyStatBox
         label="تعداد دسته‌بندی"
         value={stats.projectsByCategory?.length ?? "-"}
@@ -104,164 +110,91 @@ function Stats({ stats }: { stats: IStats | undefined }) {
 }
 
 // =====================
-// Helpers
+// Preview Gallery
 // =====================
 
-async function uploadGalleryImages(files: File[]) {
-  if (!files.length) return [];
-
-  const uploadedUrls: string[] = [];
-
-  for (const file of files) {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!res.ok) {
-      throw new Error(`آپلود فایل "${file.name}" با خطا مواجه شد.`);
-    }
-
-    const data = await res.json();
-
-    if (!data?.url) {
-      throw new Error(`URL فایل "${file.name}" از سرور دریافت نشد.`);
-    }
-
-    uploadedUrls.push(data.url);
-  }
-
-  return uploadedUrls;
-}
-
 function ImagePreviewGrid({
-  files,
-  existingUrls = [],
-  onRemoveFile,
-  onRemoveExisting,
+  urls,
+  onRemove,
+  title = "تصاویر گالری",
 }: {
-  files?: File[];
-  existingUrls?: string[];
-  onRemoveFile?: (index: number) => void;
-  onRemoveExisting?: (index: number) => void;
+  urls: string[];
+  onRemove?: (index: number) => void;
+  title?: string;
 }) {
-  const filePreviews = useMemo(() => {
-    return (files || []).map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-    }));
-  }, [files]);
-
-  React.useEffect(() => {
-    return () => {
-      filePreviews.forEach((item) => URL.revokeObjectURL(item.url));
-    };
-  }, [filePreviews]);
-
-  if (
-    (!files || files.length === 0) &&
-    (!existingUrls || existingUrls.length === 0)
-  ) {
-    return null;
-  }
+  if (!urls.length) return null;
 
   return (
-    <div className="space-y-3">
-      {!!existingUrls?.length && (
-        <div>
-          <div className="text-cyan-200 text-sm mb-2">تصاویر فعلی</div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {existingUrls.map((url, index) => (
-              <div
-                key={`${url}-${index}`}
-                className="relative rounded-xl overflow-hidden border border-cyan-900 bg-cyan-950/70"
-              >
-                <img
-                  src={url}
-                  alt={`gallery-${index}`}
-                  className="w-full h-28 object-cover"
-                />
-                {onRemoveExisting && (
-                  <button
-                    type="button"
-                    onClick={() => onRemoveExisting(index)}
-                    className="absolute top-1 left-1 bg-rose-700 hover:bg-rose-600 text-white text-xs px-2 py-1 rounded"
-                  >
-                    حذف
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+    <div className="space-y-2">
+      <div className="text-cyan-200 text-sm">{title}</div>
 
-      {!!filePreviews.length && (
-        <div>
-          <div className="text-cyan-200 text-sm mb-2">
-            تصاویر جدید انتخاب‌شده
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {filePreviews.map((item, index) => (
-              <div
-                key={`${item.file.name}-${index}`}
-                className="relative rounded-xl overflow-hidden border border-cyan-900 bg-cyan-950/70"
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        {urls.map((url, index) => (
+          <div
+            key={`${url}-${index}`}
+            className="relative rounded-xl overflow-hidden border border-cyan-900 bg-cyan-950/70"
+          >
+            <img
+              src={url}
+              alt={`gallery-${index + 1}`}
+              className="w-full h-28 object-cover"
+            />
+
+            {onRemove && (
+              <button
+                type="button"
+                onClick={() => onRemove(index)}
+                className="absolute top-2 left-2 bg-rose-700 hover:bg-rose-600 text-white text-xs px-2 py-1 rounded transition"
               >
-                <img
-                  src={item.url}
-                  alt={item.file.name}
-                  className="w-full h-28 object-cover"
-                />
-                <div className="p-2 text-[11px] text-cyan-100 truncate">
-                  {item.file.name}
-                </div>
-                {onRemoveFile && (
-                  <button
-                    type="button"
-                    onClick={() => onRemoveFile(index)}
-                    className="absolute top-1 left-1 bg-rose-700 hover:bg-rose-600 text-white text-xs px-2 py-1 rounded"
-                  >
-                    حذف
-                  </button>
-                )}
-              </div>
-            ))}
+                حذف
+              </button>
+            )}
           </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }
 
-// ==== Yup Validation Schemas ==== //
+// =====================
+// Yup Validation
+// =====================
+
 const ProjectFormSchema = Yup.object().shape({
   title: Yup.string().required("عنوان پروژه الزامی است."),
+
   slug: Yup.string()
     .matches(
       /^[a-zA-Z0-9-]+$/,
       "اسلاگ فقط باید شامل حروف انگلیسی، ارقام و - باشد.",
     )
     .required("اسلاگ الزامی است."),
+
   description: Yup.string().required("توضیحات الزامی است."),
+
   status: Yup.mixed<ProjectStatus>()
     .oneOf(["planned", "in-progress", "done", "archived"])
     .required("وضعیت پروژه الزامی است."),
+
   techStack: Yup.string().required("تکنولوژی‌ها الزامی است."),
+
   githubUrl: Yup.string()
     .url("آدرس GitHub معتبر نیست.")
     .nullable()
     .notRequired(),
+
   demoUrl: Yup.string().url("آدرس دمو معتبر نیست.").nullable().notRequired(),
+
   featured: Yup.boolean(),
   isPublished: Yup.boolean(),
+
   order: Yup.number().nullable().typeError("شماره ترتیب باید عدد باشد."),
 });
 
-// ---------------------
-// ویرایشگر پروژه
+// =====================
+// فرم ویرایش پروژه
+// =====================
+
 function UpdateProjectForm({
   project,
   onClose,
@@ -273,10 +206,13 @@ function UpdateProjectForm({
 }) {
   const [msg, setMsg] = useState<{ error?: string; succ?: string }>({});
   const [loading, setLoading] = useState(false);
-  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
-  const [existingGallery, setExistingGallery] = useState<string[]>(
-    project.gallery || [],
-  );
+  const [isUploading, setIsUploading] = useState(false);
+
+  const [gallery, setGallery] = useState<string[]>(project.gallery || []);
+
+  const handleRemoveGalleryImage = (index: number) => {
+    setGallery((prev) => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <div className="fixed top-0 left-0 w-full h-full z-50 bg-black bg-opacity-60 flex items-center justify-center px-2 sm:px-0">
@@ -294,25 +230,25 @@ function UpdateProjectForm({
           order: project.order?.toString() || "",
         }}
         validationSchema={ProjectFormSchema}
+        enableReinitialize
         onSubmit={async (values, { setSubmitting }) => {
           setLoading(true);
           setMsg({});
+
           try {
-            const uploadedNewImages = await uploadGalleryImages(galleryFiles);
-
-            const finalGallery = [...existingGallery, ...uploadedNewImages];
-
             const res = await fetch(
               `/api/projects/${encodeURIComponent(project.slug)}`,
               {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                  "Content-Type": "application/json",
+                },
                 body: JSON.stringify({
                   ...values,
-                  gallery: finalGallery,
+                  gallery,
                   techStack: values.techStack
                     .split(",")
-                    .map((x: string) => x.trim())
+                    .map((item: string) => item.trim())
                     .filter(Boolean),
                   order:
                     values.order !== "" && !isNaN(Number(values.order))
@@ -322,19 +258,25 @@ function UpdateProjectForm({
               },
             );
 
-            if (!res.ok) throw new Error("ویرایش پروژه با خطا مواجه شد.");
+            if (!res.ok) {
+              throw new Error("ویرایش پروژه با خطا مواجه شد.");
+            }
 
             const data = await res.json();
+
             onUpdate(data.data);
             setMsg({ succ: "پروژه با موفقیت ویرایش شد." });
+
             setTimeout(onClose, 900);
-          } catch (e: any) {
-            setMsg({ error: e?.message || "خطای ناشناخته" });
+          } catch (error: any) {
+            setMsg({
+              error: error?.message || "خطای ناشناخته رخ داد.",
+            });
+          } finally {
+            setSubmitting(false);
+            setLoading(false);
           }
-          setSubmitting(false);
-          setLoading(false);
         }}
-        enableReinitialize
       >
         {({ isSubmitting, values, setFieldValue }) => (
           <Form
@@ -356,6 +298,7 @@ function UpdateProjectForm({
                 placeholder="عنوان پروژه"
                 required
               />
+
               <Field
                 name="slug"
                 className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-1.5 sm:px-3 rounded focus:ring-2 focus:ring-neon-blue w-full text-sm sm:text-base"
@@ -415,11 +358,13 @@ function UpdateProjectForm({
                 className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-1.5 sm:px-3 rounded w-full text-sm sm:text-base"
                 placeholder="GitHub URL"
               />
+
               <Field
                 name="demoUrl"
                 className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-1.5 sm:px-3 rounded w-full text-sm sm:text-base"
                 placeholder="Demo URL"
               />
+
               <Field
                 name="order"
                 type="number"
@@ -435,32 +380,57 @@ function UpdateProjectForm({
             </div>
 
             {/* Gallery Upload */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <label className="text-cyan-100 text-sm font-bold">
                 گالری تصاویر پروژه
               </label>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  setGalleryFiles((prev) => [...prev, ...files]);
+
+              <UploadButton
+                endpoint="imageUploader"
+                onUploadBegin={() => {
+                  setIsUploading(true);
+                  toast.loading("در حال آپلود تصاویر...", {
+                    id: "project-gallery-upload",
+                  });
                 }}
-                className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-2 rounded w-full text-sm sm:text-base"
+                onClientUploadComplete={(res: any) => {
+                  const uploadedUrls = (res || [])
+                    .map((file: any) => file?.url ?? file?.ufsUrl)
+                    .filter(Boolean);
+
+                  if (uploadedUrls.length) {
+                    setGallery((prev) => [...prev, ...uploadedUrls]);
+
+                    toast.success("تصاویر با موفقیت آپلود شدند ✅", {
+                      id: "project-gallery-upload",
+                    });
+                  } else {
+                    toast.error("آدرس تصویر آپلودشده دریافت نشد.", {
+                      id: "project-gallery-upload",
+                    });
+                  }
+
+                  setIsUploading(false);
+                }}
+                onUploadError={(error: Error) => {
+                  toast.error(`خطا در آپلود: ${error.message}`, {
+                    id: "project-gallery-upload",
+                  });
+
+                  setIsUploading(false);
+                }}
               />
 
+              {isUploading && (
+                <div className="text-sm text-neon-blue animate-pulse">
+                  تصاویر در حال آپلود هستند...
+                </div>
+              )}
+
               <ImagePreviewGrid
-                files={galleryFiles}
-                existingUrls={existingGallery}
-                onRemoveFile={(index) =>
-                  setGalleryFiles((prev) => prev.filter((_, i) => i !== index))
-                }
-                onRemoveExisting={(index) =>
-                  setExistingGallery((prev) =>
-                    prev.filter((_, i) => i !== index),
-                  )
-                }
+                urls={gallery}
+                onRemove={handleRemoveGalleryImage}
+                title="تصاویر گالری پروژه"
               />
             </div>
 
@@ -492,17 +462,20 @@ function UpdateProjectForm({
               <button
                 type="submit"
                 className="bg-neon-blue hover:bg-cyan-800 text-white font-bold px-4 sm:px-5 py-2 rounded-xl shadow transition disabled:opacity-60 min-w-[100px] sm:min-w-[120px] w-full xs:w-auto mt-2 xs:mt-0"
-                disabled={isSubmitting || loading}
+                disabled={isSubmitting || loading || isUploading}
               >
                 {isSubmitting || loading
                   ? "در حال بروزرسانی..."
-                  : "ذخیره تغییرات"}
+                  : isUploading
+                    ? "در حال آپلود..."
+                    : "ذخیره تغییرات"}
               </button>
             </div>
 
             {msg.error && (
               <div className="text-rose-400 text-sm font-bold">{msg.error}</div>
             )}
+
             {msg.succ && (
               <div className="text-emerald-400 text-sm font-bold">
                 {msg.succ}
@@ -515,7 +488,10 @@ function UpdateProjectForm({
   );
 }
 
-// جدول ساده پروژه
+// =====================
+// جدول پروژه‌ها
+// =====================
+
 function SimpleTable({
   projects,
   onDelete,
@@ -529,17 +505,22 @@ function SimpleTable({
 
   async function handleDelete(slug: string) {
     if (!window.confirm("آیا حذف این پروژه قطعی است؟")) return;
+
     setDeleting(slug);
+
     try {
       const res = await fetch(`/api/projects/${encodeURIComponent(slug)}`, {
         method: "DELETE",
       });
+
       if (!res.ok) throw new Error();
+
       onDelete(slug);
     } catch {
       alert("خطا در حذف پروژه.");
+    } finally {
+      setDeleting(null);
     }
-    setDeleting(null);
   }
 
   return (
@@ -553,55 +534,61 @@ function SimpleTable({
               <th className="py-2 px-3 text-cyan-100">منتشر</th>
               <th className="py-2 px-3 text-cyan-100">ویژه</th>
               <th className="py-2 px-3 text-cyan-100">گالری</th>
-              <th className="py-2 px-3"></th>
+              <th className="py-2 px-3" />
             </tr>
           </thead>
+
           <tbody>
-            {projects.map((p) => (
+            {projects.map((project) => (
               <tr
-                key={p.slug}
+                key={project.slug}
                 className="border-t border-cyan-900/40 even:bg-cyan-900/30 odd:bg-cyan-950/20 hover:bg-cyan-900/50 transition"
               >
-                <td className="py-2 px-3 text-cyan-50">{p.title}</td>
+                <td className="py-2 px-3 text-cyan-50">{project.title}</td>
+
                 <td className="py-2 px-3">
                   <span
                     className={`px-2 py-0.5 rounded-lg font-bold shadow-sm ${
-                      STATUS_BG[p.status as ProjectStatus]
+                      STATUS_BG[project.status]
                     } text-xs`}
                   >
-                    {STATUS_LABELS[p.status as ProjectStatus] || p.status}
+                    {STATUS_LABELS[project.status]}
                   </span>
                 </td>
+
                 <td className="py-2 px-3 text-center">
-                  {p.isPublished ? "✅" : "—"}
+                  {project.isPublished ? "✅" : "—"}
                 </td>
+
                 <td className="py-2 px-3 text-center">
-                  {p.featured ? <span title="ویژه">⭐</span> : "—"}
+                  {project.featured ? <span title="ویژه">⭐</span> : "—"}
                 </td>
+
                 <td className="py-2 px-3 text-center">
-                  {p.gallery?.length ?? 0}
+                  {project.gallery?.length ?? 0}
                 </td>
+
                 <td className="py-2 px-3 text-center flex space-x-1 space-x-reverse gap-1 justify-center">
                   <button
                     type="button"
-                    onClick={() => onEdit(p)}
-                    className="rounded bg-cyan-800/80 hover:bg-neon-blue text-white px-3 py-1 transition disabled:opacity-60 ml-1"
-                    title="ویرایش پروژه"
-                    style={{ direction: "rtl" }}
+                    onClick={() => onEdit(project)}
+                    className="rounded bg-cyan-800/80 hover:bg-neon-blue text-white px-3 py-1 transition ml-1"
                   >
                     ویرایش
                   </button>
+
                   <button
                     type="button"
-                    onClick={() => handleDelete(p.slug)}
+                    onClick={() => handleDelete(project.slug)}
                     className="rounded bg-rose-900/70 hover:bg-rose-700 text-white px-3 py-1 transition disabled:opacity-60"
-                    disabled={deleting === p.slug}
+                    disabled={deleting === project.slug}
                   >
-                    {deleting === p.slug ? "..." : "حذف"}
+                    {deleting === project.slug ? "..." : "حذف"}
                   </button>
                 </td>
               </tr>
             ))}
+
             {projects.length === 0 && (
               <tr>
                 <td colSpan={6} className="text-center py-7 text-cyan-200">
@@ -619,53 +606,56 @@ function SimpleTable({
             هیچ پروژه‌ای ثبت نشده است.
           </div>
         )}
-        {projects.map((p) => (
+
+        {projects.map((project) => (
           <div
-            key={p.slug}
+            key={project.slug}
             className="border border-cyan-900 bg-cyan-950/70 rounded-2xl shadow px-3 py-3 flex flex-col gap-2"
           >
             <div className="flex items-center justify-between">
               <div className="font-bold text-neon-blue text-base">
-                {p.title}
+                {project.title}
               </div>
+
               <span
                 className={`px-2 py-0.5 rounded-lg font-bold shadow-sm ${
-                  STATUS_BG[p.status as ProjectStatus]
+                  STATUS_BG[project.status]
                 } text-xs whitespace-nowrap ml-1`}
               >
-                {STATUS_LABELS[p.status as ProjectStatus] || p.status}
+                {STATUS_LABELS[project.status]}
               </span>
             </div>
 
             <div className="flex items-center gap-2 justify-start flex-wrap">
               <span className="text-xs text-cyan-300">
-                {p.isPublished ? "منتشرشده" : "منتشرنشده"}
+                {project.isPublished ? "منتشرشده" : "منتشرنشده"}
               </span>
+
               <span className="text-xs text-yellow-400">
-                {p.featured ? "⭐ ویژه" : ""}
+                {project.featured ? "⭐ ویژه" : ""}
               </span>
+
               <span className="text-xs text-cyan-300">
-                گالری: {p.gallery?.length ?? 0}
+                گالری: {project.gallery?.length ?? 0}
               </span>
             </div>
 
             <div className="flex gap-2 justify-between mt-2 flex-wrap">
               <button
                 type="button"
-                onClick={() => onEdit(p)}
-                className="rounded bg-cyan-800/80 hover:bg-neon-blue text-white px-3 py-1 transition disabled:opacity-60 text-sm"
-                title="ویرایش پروژه"
-                style={{ direction: "rtl" }}
+                onClick={() => onEdit(project)}
+                className="rounded bg-cyan-800/80 hover:bg-neon-blue text-white px-3 py-1 transition text-sm"
               >
                 ویرایش
               </button>
+
               <button
                 type="button"
-                onClick={() => handleDelete(p.slug)}
+                onClick={() => handleDelete(project.slug)}
                 className="rounded bg-rose-900/70 hover:bg-rose-700 text-white px-3 py-1 transition disabled:opacity-60 text-sm"
-                disabled={deleting === p.slug}
+                disabled={deleting === project.slug}
               >
-                {deleting === p.slug ? "..." : "حذف"}
+                {deleting === project.slug ? "..." : "حذف"}
               </button>
             </div>
           </div>
@@ -675,10 +665,19 @@ function SimpleTable({
   );
 }
 
+// =====================
+// فرم افزودن پروژه
+// =====================
+
 function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
   const [msg, setMsg] = useState<{ error?: string; succ?: string }>({});
   const [loading, setLoading] = useState(false);
-  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [gallery, setGallery] = useState<string[]>([]);
+
+  const handleRemoveGalleryImage = (index: number) => {
+    setGallery((prev) => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <Formik
@@ -700,17 +699,17 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
         setMsg({});
 
         try {
-          const galleryUrls = await uploadGalleryImages(galleryFiles);
-
           const res = await fetch("/api/projects", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
               ...values,
-              gallery: galleryUrls,
+              gallery,
               techStack: values.techStack
                 .split(",")
-                .map((x: string) => x.trim())
+                .map((item: string) => item.trim())
                 .filter(Boolean),
               order:
                 values.order !== "" && !isNaN(Number(values.order))
@@ -719,20 +718,24 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
             }),
           });
 
-          if (!res.ok) throw new Error("ثبت پروژه با خطا مواجه شد.");
+          if (!res.ok) {
+            throw new Error("ثبت پروژه با خطا مواجه شد.");
+          }
 
           const data = await res.json();
 
           onAdd(data.data);
           resetForm();
-          setGalleryFiles([]);
+          setGallery([]);
           setMsg({ succ: "پروژه اضافه شد." });
-        } catch (e: any) {
-          setMsg({ error: e?.message || "خطای ناشناخته" });
+        } catch (error: any) {
+          setMsg({
+            error: error?.message || "خطای ناشناخته رخ داد.",
+          });
+        } finally {
+          setSubmitting(false);
+          setLoading(false);
         }
-
-        setSubmitting(false);
-        setLoading(false);
       }}
     >
       {({ isSubmitting, values, setFieldValue }) => (
@@ -747,6 +750,7 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
               placeholder="عنوان پروژه"
               required
             />
+
             <Field
               name="slug"
               className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-1.5 sm:px-3 rounded focus:ring-2 focus:ring-neon-blue w-full text-sm sm:text-base"
@@ -804,11 +808,13 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
               className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-1.5 sm:px-3 rounded w-full text-sm sm:text-base"
               placeholder="GitHub URL"
             />
+
             <Field
               name="demoUrl"
               className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-1.5 sm:px-3 rounded w-full text-sm sm:text-base"
               placeholder="Demo URL"
             />
+
             <Field
               name="order"
               type="number"
@@ -824,26 +830,58 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
           </div>
 
           {/* Gallery Upload */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <label className="text-cyan-100 text-sm font-bold">
               گالری تصاویر پروژه
             </label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) => {
-                const files = Array.from(e.target.files || []);
-                setGalleryFiles((prev) => [...prev, ...files]);
+
+            <UploadButton
+              endpoint="imageUploader"
+              onUploadBegin={() => {
+                setIsUploading(true);
+
+                toast.loading("در حال آپلود تصاویر...", {
+                  id: "project-gallery-upload",
+                });
               }}
-              className="border border-cyan-800 bg-cyan-900/40 text-cyan-100 px-2 py-2 rounded w-full text-sm sm:text-base"
+              onClientUploadComplete={(res: any) => {
+                const uploadedUrls = (res || [])
+                  .map((file: any) => file?.url ?? file?.ufsUrl)
+                  .filter(Boolean);
+
+                if (uploadedUrls.length) {
+                  setGallery((prev) => [...prev, ...uploadedUrls]);
+
+                  toast.success("تصاویر با موفقیت آپلود شدند ✅", {
+                    id: "project-gallery-upload",
+                  });
+                } else {
+                  toast.error("آدرس تصویر آپلودشده دریافت نشد.", {
+                    id: "project-gallery-upload",
+                  });
+                }
+
+                setIsUploading(false);
+              }}
+              onUploadError={(error: Error) => {
+                toast.error(`خطا در آپلود: ${error.message}`, {
+                  id: "project-gallery-upload",
+                });
+
+                setIsUploading(false);
+              }}
             />
 
+            {isUploading && (
+              <div className="text-sm text-neon-blue animate-pulse">
+                تصاویر در حال آپلود هستند...
+              </div>
+            )}
+
             <ImagePreviewGrid
-              files={galleryFiles}
-              onRemoveFile={(index) =>
-                setGalleryFiles((prev) => prev.filter((_, i) => i !== index))
-              }
+              urls={gallery}
+              onRemove={handleRemoveGalleryImage}
+              title="تصاویر انتخاب‌شده"
             />
           </div>
 
@@ -875,15 +913,20 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
             <button
               type="submit"
               className="bg-neon-blue hover:bg-cyan-800 text-white font-bold px-4 sm:px-5 py-2 rounded-xl shadow transition disabled:opacity-60 min-w-[100px] sm:min-w-[120px] w-full xs:w-auto mt-2 xs:mt-0"
-              disabled={isSubmitting || loading}
+              disabled={isSubmitting || loading || isUploading}
             >
-              {isSubmitting || loading ? "در حال ثبت..." : "افزودن پروژه"}
+              {isSubmitting || loading
+                ? "در حال ثبت..."
+                : isUploading
+                  ? "در حال آپلود..."
+                  : "افزودن پروژه"}
             </button>
           </div>
 
           {msg.error && (
             <div className="text-rose-400 text-sm font-bold">{msg.error}</div>
           )}
+
           {msg.succ && (
             <div className="text-emerald-400 text-sm font-bold">{msg.succ}</div>
           )}
@@ -892,6 +935,10 @@ function AddProjectForm({ onAdd }: { onAdd: (p: IProject) => void }) {
     </Formik>
   );
 }
+
+// =====================
+// صفحه اصلی
+// =====================
 
 export default function ProjectsPage() {
   const {
@@ -910,26 +957,36 @@ export default function ProjectsPage() {
   const [editingProject, setEditingProject] = useState<IProject | null>(null);
 
   React.useEffect(() => {
-    if (projectsResponse?.data) setProjects(projectsResponse.data);
+    if (projectsResponse?.data) {
+      setProjects(projectsResponse.data);
+    }
   }, [projectsResponse]);
 
-  const handleAddProject = (project: IProject) =>
+  const handleAddProject = (project: IProject) => {
     setProjects((prev) => [project, ...prev]);
+  };
 
-  const handleDeleteProject = (slug: string) =>
-    setProjects((prev) => prev?.filter((p) => p.slug !== slug) ?? []);
+  const handleDeleteProject = (slug: string) => {
+    setProjects((prev) => prev.filter((project) => project.slug !== slug));
+  };
 
-  const handleEditProjectClick = (project: IProject) =>
+  const handleEditProjectClick = (project: IProject) => {
     setEditingProject(project);
+  };
 
   const handleUpdateProject = (updatedProject: IProject) => {
     setProjects((prev) =>
-      prev.map((p) => (p.slug === updatedProject.slug ? updatedProject : p)),
+      prev.map((project) =>
+        project.slug === updatedProject.slug ? updatedProject : project,
+      ),
     );
+
     setEditingProject(null);
   };
 
-  const handleCloseUpdate = () => setEditingProject(null);
+  const handleCloseUpdate = () => {
+    setEditingProject(null);
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-2 md:px-6 py-6 sm:py-9">

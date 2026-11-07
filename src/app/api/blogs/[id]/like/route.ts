@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 import Like from "@/models/Like";
 
+// 👇 New: RouteParams uses plain object (not Promise-based)
 type RouteParams = {
   params: Promise<{
     id: string;
@@ -29,33 +30,19 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     const postId = new mongoose.Types.ObjectId(id);
 
+    // Future: get userId if auth, currently using only visitorId
     const userId = null;
-
     const visitorId = req.cookies.get("visitorId")?.value || null;
 
-    const identityConditions = [];
-
+    let liked = false;
     if (userId && mongoose.Types.ObjectId.isValid(userId)) {
-      identityConditions.push({
+      liked = !!(await Like.exists({
+        postId,
         userId: new mongoose.Types.ObjectId(userId),
-      });
+      }));
+    } else if (visitorId) {
+      liked = !!(await Like.exists({ postId, visitorId }));
     }
-
-    if (visitorId) {
-      identityConditions.push({
-        visitorId,
-      });
-    }
-
-    const liked =
-      identityConditions.length > 0
-        ? Boolean(
-            await Like.findOne({
-              postId,
-              $or: identityConditions,
-            }).lean(),
-          )
-        : false;
 
     const likeCount = await Like.countDocuments({ postId });
 
@@ -98,8 +85,8 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
     const postId = new mongoose.Types.ObjectId(id);
 
+    // Future: get userId if logged in
     const userId = null;
-
     let visitorId = req.cookies.get("visitorId")?.value;
     let shouldSetVisitorCookie = false;
 
@@ -108,21 +95,14 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       shouldSetVisitorCookie = true;
     }
 
-    const identityConditions = [];
-
+    // مشخص کردن اینکه این کاربر یا مهمان آیا قبلاً لایک کرده؟
+    let query: any = { postId };
     if (userId && mongoose.Types.ObjectId.isValid(userId)) {
-      identityConditions.push({
-        userId: new mongoose.Types.ObjectId(userId),
-      });
-    }
-
-    if (visitorId) {
-      identityConditions.push({
-        visitorId,
-      });
-    }
-
-    if (identityConditions.length === 0) {
+      query.userId = new mongoose.Types.ObjectId(userId);
+    } else if (visitorId) {
+      query.visitorId = visitorId;
+    } else {
+      // Neither logged in nor visitorId exists
       return NextResponse.json(
         {
           success: false,
@@ -132,39 +112,21 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const existingLike = await Like.findOne({
-      postId,
-      $or: identityConditions,
-    });
+    const existingLike = await Like.findOne(query);
 
     let liked: boolean;
 
     if (existingLike) {
-      await Like.deleteOne({
-        _id: existingLike._id,
-      });
-
+      // اگر قبلا لایک شده بود، حذف کن (دیس‌لایک)
+      await Like.deleteOne({ _id: existingLike._id });
       liked = false;
     } else {
-      const createPayload: {
-        postId: mongoose.Types.ObjectId;
-        userId?: mongoose.Types.ObjectId;
-        visitorId?: string;
-      } = {
-        postId,
-      };
-
-      if (userId && mongoose.Types.ObjectId.isValid(userId)) {
-        createPayload.userId = new mongoose.Types.ObjectId(userId);
-      } else if (visitorId) {
-        createPayload.visitorId = visitorId;
-      }
-
-      await Like.create(createPayload);
-
+      // وگرنه ثبت لایک جدید
+      await Like.create(query);
       liked = true;
     }
 
+    // مجموع کل لایک های این پست را حساب کن (نه فقط کاربر حاضر)
     const likeCount = await Like.countDocuments({ postId });
 
     const response = NextResponse.json({

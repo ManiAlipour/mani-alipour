@@ -1,50 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { addContactSchema } from "@/lib/validators/contact.validator";
-import { createContact, getContacts } from "@/services/contact.service";
-
-export const GET = async (req: NextRequest) => {
-  try {
-    await connectDB();
-    const { searchParams } = new URL(req.url);
-
-    const limit = Number(searchParams.get("limit")) || 20;
-    const offset = Number(searchParams.get("offset")) || 0;
-    const status = searchParams.get("status");
-    const sort = searchParams.get("sort") || "-createdAt";
-
-    const filter: any = {};
-    if (status) filter.status = status;
-
-    const sortObj: any = {};
-    if (sort.startsWith("-")) {
-      sortObj[sort.slice(1)] = -1;
-    } else {
-      sortObj[sort] = 1;
-    }
-
-    const { contacts, total } = await getContacts({
-      filter,
-      limit,
-      offset,
-      sort: sortObj,
-    });
-
-    return NextResponse.json({
-      message: "لیست پیام‌ها با موفقیت دریافت شد.",
-      data: contacts,
-      total,
-    });
-  } catch (error: any) {
-    return NextResponse.json(
-      {
-        message: "خطا در دریافت پیام‌ها",
-        error: error.message || error,
-      },
-      { status: 500 },
-    );
-  }
-};
+import { createContact } from "@/services/contact.service";
 
 export const POST = async (req: NextRequest) => {
   try {

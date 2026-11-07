@@ -1,41 +1,40 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { BsTelegram, BsLinkedin, BsEnvelope } from "react-icons/bs";
 
 export default function Contact() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    subject: "",
     message: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const formRef = useRef<HTMLFormElement>(null);
-
-  function scrollFormToTop() {
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
 
-    setTimeout(() => {
-      if (!form.name || !form.email || !form.message) {
-        setError("لطفاً تمام فیلدها را پر کنید.");
-        setSubmitting(false);
-        scrollFormToTop();
-        return;
-      }
+    try {
+      const response = await fetch("/api/contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.errors?.[0] || result.message || "ارسال پیام انجام نشد. دوباره تلاش کنید.");
       setSubmitting(false);
       setSubmitted(true);
-      setForm({ name: "", email: "", message: "" });
-      scrollFormToTop();
+      setForm({ name: "", email: "", subject: "", message: "" });
       setTimeout(() => setSubmitted(false), 3500);
-    }, 1400);
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "ارسال پیام انجام نشد. دوباره تلاش کنید.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -47,6 +46,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
+      aria-labelledby="contact-title"
       className="relative w-full py-24 px-4 md:px-0 bg-gradient-to-br from-[#273143] via-[#212749] to-[#172537] min-h-[500px] overflow-x-clip rounded-[2.75rem] shadow-2xl border-t-2 border-cyan-800/50 mt-20 mb-10 flex flex-col items-center"
     >
       {/* Gradient */}
@@ -57,9 +57,9 @@ export default function Contact() {
           <span className="rounded-full shadow-md p-3 bg-gradient-to-tr from-cyan-500/60 via-indigo-400/50 to-cyan-800/50 text-5xl md:text-[3.5rem] border border-cyan-400/20 animate-bounce-slow">
             📩
           </span>
-          <span className="text-transparent bg-gradient-to-r from-cyan-400 via-indigo-200 to-cyan-300 bg-clip-text font-black text-3xl md:text-5xl leading-tight drop-shadow-lg">
-            تماس باما
-          </span>
+          <h2 id="contact-title" className="text-transparent bg-gradient-to-r from-cyan-400 via-indigo-200 to-cyan-300 bg-clip-text font-black text-3xl md:text-5xl leading-tight drop-shadow-lg">
+            تماس با من
+          </h2>
         </div>
         <p className="text-center text-cyan-100/80 text-lg md:text-xl leading-relaxed mt-1.5 font-normal max-w-xl mx-auto">
           برای استعلام، همکاری، پروژه یا ارتباط هرچه سریع‌تر از راه‌های زیر با
@@ -108,8 +108,7 @@ export default function Contact() {
       {/* Contact Form */}
       <div className="relative z-10 max-w-xl mx-auto w-full mt-6 animate-in fade-in slide-in-from-bottom">
         <form
-          ref={formRef}
-          autoComplete="off"
+          autoComplete="on"
           onSubmit={handleSubmit}
           className="bg-gradient-to-br from-[#222c3d] via-[#25304a]/85 to-[#223358] border border-cyan-700/30 rounded-3xl shadow-2xl px-8 py-8 flex flex-col gap-6 md:gap-7"
         >
@@ -117,18 +116,18 @@ export default function Contact() {
             <span className="text-2xl md:text-3xl text-cyan-300/80 animate-pulse">
               📝
             </span>
-            <span className="font-bold text-lg md:text-xl text-cyan-100/95">
+            <h3 className="font-bold text-lg md:text-xl text-cyan-100/95">
               فرم ارتباط سریع
-            </span>
+            </h3>
           </div>
 
           {submitted && (
-            <div className="bg-cyan-900/80 border border-cyan-400/40 text-cyan-100 px-4 py-2 rounded-xl text-center mb-3 font-extrabold shadow-xl animate-in fade-in slide-in-from-bottom">
+            <div role="status" aria-live="polite" className="bg-cyan-900/80 border border-cyan-400/40 text-cyan-100 px-4 py-2 rounded-xl text-center mb-3 font-extrabold shadow-xl animate-in fade-in slide-in-from-bottom">
               پیام شما با موفقیت ارسال شد! ممنون از ارتباط شما 💙
             </div>
           )}
           {error && (
-            <div className="bg-red-900/50 border border-red-700/20 text-red-100 px-4 py-2 rounded-xl text-center mb-3 font-bold shadow-md animate-fade-in">
+            <div role="alert" className="bg-red-900/50 border border-red-700/20 text-red-100 px-4 py-2 rounded-xl text-center mb-3 font-bold shadow-md animate-fade-in">
               {error}
             </div>
           )}
@@ -161,6 +160,9 @@ export default function Contact() {
             />
           </div>
           <div>
+            <Field id="subject" icon="✉️" label="موضوع (اختیاری)" name="subject" value={form.subject} onChange={handleChange} disabled={submitting} placeholder="موضوع پیام" />
+          </div>
+          <div>
             <Field
               id="message"
               icon="💬"
@@ -173,6 +175,7 @@ export default function Contact() {
               placeholder="سلام! خواستم بپرسم ..."
               required
               minRows={4}
+              maxLength={5000}
             />
           </div>
 
@@ -290,6 +293,7 @@ function Field({
   required,
   autoComplete,
   minRows = 2,
+  maxLength,
 }: {
   id: string;
   icon: React.ReactNode;
@@ -304,10 +308,12 @@ function Field({
   required?: boolean;
   autoComplete?: string;
   minRows?: number;
+  maxLength?: number;
 }) {
   const Comp = as === "textarea" ? "textarea" : "input";
   return (
     <div className="relative flex items-stretch w-full group">
+      <label htmlFor={id} className="sr-only">{label}</label>
       {/* Input */}
       <Comp
         id={id}
@@ -319,6 +325,7 @@ function Field({
         placeholder={label + (required ? " *" : "")}
         autoComplete={autoComplete}
         rows={as === "textarea" ? minRows : undefined}
+        maxLength={maxLength}
         required={required}
         aria-required={required}
         className={`bg-cyan-900/50 text-cyan-100 text-base md:text-lg px-5 pt-8 pb-2 rounded-xl transition-all outline-none border-2 border-cyan-600/10 focus:border-cyan-400 

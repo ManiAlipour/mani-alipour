@@ -19,7 +19,11 @@ const yekan = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "مانی علیپور | توسعه دهنده فول استک و نویسنده مقالات وب",
+  metadataBase: new URL("https://manialipour.ir"),
+  title: {
+    default: "مانی علیپور | توسعه‌دهنده فول‌استک وب",
+    template: "%s | مانی علیپور",
+  },
   description:
     "وبسایت شخصی مانی، توسعه دهنده فول استک وب. مجموعه ای از پروژه ها، مقالات فنی و تجربیات توسعه با فناوری های مدرن وب و معماری اپلیکیشن های مقیاس پذیر.",
   keywords: [
@@ -46,6 +50,13 @@ export const metadata: Metadata = {
     siteName: "Mani Alipour",
     locale: "fa_IR",
     type: "website",
+    images: [{ url: "/images/og/project-og.png", width: 1200, height: 630, alt: "مانی علیپور، توسعه‌دهنده فول‌استک وب" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "مانی علیپور | توسعه‌دهنده فول‌استک وب",
+    description: "وبسایت شخصی مانی علیپور؛ پروژه‌ها، مقالات فنی و تجربه‌های توسعه وب.",
+    images: ["/images/og/project-og.png"],
   },
   alternates: {
     canonical: "https://manialipour.ir",

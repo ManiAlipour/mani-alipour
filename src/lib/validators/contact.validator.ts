@@ -12,7 +12,13 @@ export const addContactSchema = yup.object().shape({
     .lowercase()
     .email("ایمیل نامعتبر است.")
     .required("وارد کردن ایمیل الزامی است."),
-  subject: yup.string().trim(),
+  subject: yup.string().trim().max(120, "موضوع نباید بیشتر از ۱۲۰ کاراکتر باشد."),
+  message: yup
+    .string()
+    .trim()
+    .min(5, "پیام حداقل باید شامل ۵ کاراکتر باشد.")
+    .max(5000, "پیام نباید بیشتر از ۵۰۰۰ کاراکتر باشد.")
+    .required("وارد کردن پیام الزامی است."),
 });
 
 export const updateContactSchema = yup.object().shape({

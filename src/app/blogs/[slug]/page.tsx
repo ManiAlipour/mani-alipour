@@ -310,7 +310,7 @@ export default async function BlogPage({ params }: IBlogPage) {
               </header>
 
               <section
-                className="prose blog-content prose-invert prose-cyan max-w-none"
+                className="prose text-justify blog-content prose-invert prose-cyan max-w-none"
                 dangerouslySetInnerHTML={{ __html: updatedHtml }}
               />
 
